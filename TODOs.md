@@ -1,76 +1,81 @@
-# ARCHITECTURE
+## ARCHITECTURE
 
-## TODO 
-change class structure: objectives into FeatureObjectives(get_layer) & ImageObjectives()
---> for transparent images (i.e. incl alpha channel)
+### proper package structure with setup etc
 
-## TODO
-several images at the same time if init from image
+### change class structure
+split objectives into FeatureObjectives(get_layer) & ImageObjectives()
+--> what's a good framework for ImageObjectives?
+    - should enable transparent images (i.e. incl alpha channel)
+    - should enable smoothing/blurring of images in each step (not as TFM, but actually smoothing)
 
-## TODO
-potentially: rethink whole architecture with render - obj classes. Maybe something more elegant?
+### enable several images at the same time for init from image
 
-## TODO
-basic testing
+### rethink whole architecture
+with render - obj classes. Maybe something more elegant?
 
+### basic testing
 
-## TODO
-objectives - there still might be bugs when optimizing more than one img at the same time:
+### objectives 
+there still might be bugs when optimizing more than one img at the same time:
 check that there's no gradient leakage between those images
 
 
-# EXPLORATION
+## EXPLORATION
 
-## TODO
+### learning policies
 try other learning policies; e.g. OneCycle, multiple cycles, or other LR Schedulers?
 maybe even different lrs for different pixels? e.g. in center different than outside?
 
-## TODO
+### color models
 try out different color models; especially HSL, or maybe even fix SL (e.g. from a real image) and then only change hue (different learning rates for H, S, and L)? -> walk cyclically through hue? check out different hue parametrizations, such as Munsell, NCS
 
-## TODO
-how will training the networks already in HSL (or other color space) change feature visualizations?
+### sharper imgs?
+what happens if we add zeroth/first layer + later layer objective? shouldn't this make sharp but meaningful images?
+ ---> doesn't seem to work well! doesn't make anything more sharp in first try
 
-## TODO:
- what happens if we add zeroth/first layer + later layer objective? shouldn't this make sharp but meaningful images?
- ---> doesn't seem to work well! doesn't make anything more sharp
-
-## TODO:
+### make images more real
 ImageObjective that penalize init from image images to look more like the original image (eg in ssim)(needs changed class structure)
 
-## TODO
+### quantitative evaluation of visualizations
+What kind of metrics to compare different visualization strategies?
+
+
+### Combine attribution & visualization
 combine optimization with CAM: focus feature visualization on those parts of an image that the cam shows to be most important for the clf
 
-# EXPLORATION - TRAINING
+## EXPLORATION - TRAINING
 
-## TODO
+### color space in training
+how will training the networks already in HSL (or other color space) change feature visualizations?
+
+### different training schemes
+how do different training approaches (#epochs, learning rate & policy, data augmentation, overfit vs underfit, ...) change the visualizations?
+--> is there any prior work on this?? couldn't find anything interesting...
+
+### image patches in training/testing data set
 find image patches that most highly activate channels instead of optimize! --> everywhere instead of fv? (first tests somewhat discouraging - needs another stricter try)
 
-# General
-## TODO
+## General
+### augmentation library
 use transformation library such as kornia or nvidia-dali instead of own ones (first benchmark; a lot of stuff is prob better on GPU than on CPU)
 
-## TODO
+### check tfms
 include proper transformations for visualizations --> they should match what we trained with, not weird resizes
 -> check everywhere, e.g. in initializer as well
 
-## TODO
+### check decorrelation
 dataset specific decorrelation! (see beginning of `img_param.py`)
 
-# INTERFACE & EXPORT
+## INTERFACE & EXPORT
 
-## TODO
-make feature importances more intuitive, e.g. via bars
+### whole web interface!
 
-## TODO
-whole export stuff is a mess --> clean up or better write new from scratch
+### whole export stuff is a mess
+--> clean up or better write new from scratch
 
-## TODO
-whole web interface!
+## PORT LUCID
 
-# PORT LUCID
-
-## TODO 
+### transparency channel
 alpha channel! (start - `alpha_stuff.py`
  -> clean everything up, currently via list and everything's ugly
  -> background image should be way smoother
@@ -80,32 +85,29 @@ alpha channel! (start - `alpha_stuff.py`
 
 
 
-## TODO
-diversity!
+### diversity
 --> check whether current impl is correct -> looks different than in tf and doesn't work well at all?
 --> this for `ChannelDiversity`, `ConvNeuronDiversity` and `FCDiversity`, and potentially then also for others
 
-## TODO
-lots of other stuff. e.g.
+### lots of other stuff.
+e.g.
     - check whether DirectionChannel works well
     - more objectives
     - multiply two objectives
     - differential feature parametrizations, ...
 
 
-# ATTRIBUTION
+## ATTRIBUTION
 
-## TODO
-better/other alternatives to CAM (or optimizations to CAM)
-those right now are shitty and also sometimes constant...
+### improve/debug CAM
+vis right now are shitty and also sometimes constant...
 
-## TODO
-include guided backprop & occlusion maps from other scripts here
+### include guided backprop & occlusion maps from other scripts here
 
-# GWAS
+## GWAS
 
-## TODO
+### associations?
 also show association between each neuron and genotype --> gives even more interpretability
 
-## TODO:
+### stats?
 create many new images via feature visualization and then --> can we use them for statistics?
