@@ -2,7 +2,7 @@
 
 ## ARCHITECTURE
 
-### proper package structure with setup etc
+### proper package structure
 
 ### change class structure
 
