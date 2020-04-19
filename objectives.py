@@ -4,13 +4,15 @@ import numpy as np
 
 import torch
 
+
 class Objective(ABC):
     # TODO make sum([obj1, obj2, ...]) work
     def __init__(self, get_layer):
         self.get_layer = get_layer
 
     def register(self, model):
-        self.layer_hook = self.get_layer(model).register_forward_hook(self._hook)
+        self.layer_hook = self.get_layer(
+            model).register_forward_hook(self._hook)
 
     def remove_hook(self):
         self.layer_hook.remove()
@@ -20,7 +22,7 @@ class Objective(ABC):
         return loss
 
     def backward(self):
-        val = self._compute_loss() 
+        val = self._compute_loss()
         val.backward()
 
     def __add__(self, other):
@@ -28,7 +30,7 @@ class Objective(ABC):
 
     def __neg__(self):
         return JointObjective([self], [-1.])
-    
+
     def __sub__(self, other):
         return JointObjective([self, other], [1., -1.])
 
@@ -37,7 +39,7 @@ class Objective(ABC):
             return JointObjective([self], [other])
         else:
             raise NotImplementedError
-    
+
     def __rmul__(self, other):
         return self.__mul__(other)
 
@@ -46,8 +48,6 @@ class Objective(ABC):
 
     def _hook(self, module, input, output):
         pass
-
-   
 
 
 class JointObjective(Objective):
@@ -66,7 +66,7 @@ class JointObjective(Objective):
     def remove_hook(self):
         for obj in self.objectives:
             obj.remove_hook()
-    
+
     def _compute_loss(self):
         loss = 0.
         for w, o in zip(self.weights, self.objectives):
@@ -87,6 +87,7 @@ class ConvNeuron(Objective):
             n_x, n_y = self.n_x, self.n_y
         self.output = output[:, self.channel, n_x, n_y]
 
+
 class FCNeuron(Objective):
     def __init__(self, get_layer, neuron=0):
         super().__init__(get_layer)
@@ -94,7 +95,8 @@ class FCNeuron(Objective):
 
     def _hook(self, module, input, output):
         self.output = output[:, self.neuron]
-    
+
+
 class Channel(Objective):
     # TODO: speed up when only one objective is given (i.e. no full forward pass)
     # TODO: several objectives (i.e. self.output no single but several
@@ -103,6 +105,7 @@ class Channel(Objective):
     e.g. channel = 10
     get_layer = lambda model: model.layer1[0].conv1
     '''
+
     def __init__(self, get_layer, channel):
         super().__init__(get_layer)
         self.channel = channel
@@ -111,14 +114,14 @@ class Channel(Objective):
         # TODO check which one is correct/better!
         # TODO then propagate for all objectives!!
         #self.output = output[:, self.channel, :, :]
-        self.output = output[:, self.channel, :, :].sum([-1,-2])
-
+        self.output = output[:, self.channel, :, :].sum([-1, -2])
 
 
 class DirectionChannel(Objective):
     def __init__(self, get_layer, direction):
         super().__init__(get_layer)
-        self.direction = torch.tensor(direction, dtype=torch.float32).view(1, -1)
+        self.direction = torch.tensor(
+            direction, dtype=torch.float32).view(1, -1)
 
     def _hook(self, module, input, output):
         self.output = output[:, :, :, :]
@@ -129,6 +132,7 @@ class DirectionChannel(Objective):
         output = self.output.sum(-1).sum(-1) / n_neurons
         loss = -torch.cosine_similarity(output, self.direction)
         return loss.mean()
+
 
 class ConvNeuronDiversity(Objective):
     # TODO different gram aggregation (e.g. max)
@@ -149,6 +153,7 @@ class ConvNeuronDiversity(Objective):
         gram = torch.triu(gram, diagonal=1)
         self.output = -gram.sum(1)
 
+
 def get_diversity_like(obj):
     if isinstance(obj, Channel):
         return ChannelDiversity(obj.get_layer, obj.channel)
@@ -157,11 +162,13 @@ def get_diversity_like(obj):
     else:
         raise NotImplementedError
 
+
 class ChannelDiversity(Objective):
     # TODO different gram aggregation (e.g. max)
     def __init__(self, get_layer, channel):
         super().__init__(get_layer)
         self.channel = channel
+
     def _hook(self, module, input, output):
         b = output.shape[0]
         flattened = output[:, self.channel].view(b, -1)
@@ -169,7 +176,8 @@ class ChannelDiversity(Objective):
         gram = gram / gram.norm(p=2)
         gram = torch.triu(gram, diagonal=1)
         self.output = -gram.sum(1)
-        
+
+
 class FCDiversity(Objective):
     # TODO different gram aggregation (e.g. max)
     def __init__(self, get_layer, neuron=0):
@@ -184,13 +192,14 @@ class FCDiversity(Objective):
         gram = torch.triu(gram, diagonal=1)
         self.output = -gram.sum(1)
 
+
 class Layer(Objective):
     '''
     get_layer = lambda model: model.layer1[0].conv1
     '''
+
     def __init__(self, get_layer):
         super().__init__(get_layer)
 
     def _hook(self, module, input, output):
         self.output = output[:, :, :, :]
-

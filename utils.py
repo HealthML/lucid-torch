@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch import nn
 
+
 def prep_model(model, dev):
     # TODO rename
     '''eval, move to dev & make ReLUs not inplace'''
@@ -32,9 +33,11 @@ def compute_layer(inp, model, layer_func, dev, include_grad=False, targets=None)
     '''
     model = prep_model(model, dev)
     output = []
-    hook = layer_func(model).register_forward_hook(lambda m, i, o: output.append(o.detach()))
+    hook = layer_func(model).register_forward_hook(
+        lambda m, i, o: output.append(o.detach()))
     if include_grad:
-        hook_backward = layer_func(model).register_backward_hook(lambda m, i, o: output.append(o))
+        hook_backward = layer_func(model).register_backward_hook(
+            lambda m, i, o: output.append(o))
 
     out = model(inp.to(dev))
 
@@ -45,6 +48,7 @@ def compute_layer(inp, model, layer_func, dev, include_grad=False, targets=None)
         hook_backward.remove()
 
     return output
+
 
 def build_spritemap(channel_imgs, border=0, int_format=False):
     # TODO rename to create_spritemap?
@@ -86,4 +90,3 @@ def build_spritemap(channel_imgs, border=0, int_format=False):
 
 def namify(string):
     return '_'.join(string.split())
-
