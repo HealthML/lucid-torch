@@ -1,14 +1,18 @@
-from base import *
-from torchvision import transforms
-from torch.utils.data.dataset import Dataset
+import warnings
+from os.path import join
+
+import numpy as np
+import pandas as pd
 import torch
 from PIL import Image
-import pandas as pd
 from scipy.stats import pearsonr
+from torch.utils.data.dataset import Dataset
+from torchvision import transforms
 from tqdm import tqdm
-import pickle
-from os.path import join
-import warnings
+
+from skimage.transform import resize as sk_resize
+from utils import prep_model
+
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
@@ -89,12 +93,12 @@ def get_patch_to_channel(model, dataset, layer_func, channel=0, n_patches=3, n_l
     output = sorted(output)
     patches = []
     for val, b, i, j in output[-n_patches:][::-1]:
-        x, y = i*layer_x, j*layer_y
+        x, y = i * layer_x, j * layer_y
         img = dataset.get_before_tensor(b)
         if n_loader > 1:
             img = img[0]
-        patch = img.crop(box=(y, x, y+pix_per_box_y, x+pix_per_box_x))
-        #patch = img.crop(box=(x, y, x+pix_per_box_x, y+pix_per_box_y))
+        patch = img.crop(box=(y, x, y + pix_per_box_y, x + pix_per_box_x))
+        # patch = img.crop(box=(x, y, x+pix_per_box_x, y+pix_per_box_y))
         patches.append((patch, val))
 
     hook.remove()
@@ -119,8 +123,8 @@ def get_highest_activation_images(model, dataset, n_imgs=3, pred_ind=None, n_loa
         inp = inp.to(dev).view(1, *inp.shape)
         out = model(inp)[:, pred_ind].flatten().item()
         all_out.append(out)
-    sort_idx = np.argsort(all_out)
-    lo_idx, hi_idx = sort_idx[:n_imgs], sort_idx[-n_imgs:]
+    # sort_idx = np.argsort(all_out)
+    # lo_idx, hi_idx = sort_idx[:n_imgs], sort_idx[-n_imgs:]
     return all_out
 
 
@@ -129,7 +133,7 @@ def get_data(size_1=512, size_2=None, size=None, n_subs=1000):
     BASE_IMG = '/home/Matthias.Kirchler/retina/kaggle/data/'
     train_dir = 'train_max512'
     df = pd.read_csv(join(BASE_IMG, 'trainLabels.csv'))
-    df.image = [join(BASE_IMG, train_dir, p+'.jpeg') for p in df.image]
+    df.image = [join(BASE_IMG, train_dir, p + '.jpeg') for p in df.image]
     df = df.drop([1146, ])[:n_subs]
 
     if size_1 is None:
@@ -166,7 +170,7 @@ class ImageDataset(Dataset):
         return len(self.df)
 
     def get_before_tensor(self, idx):
-        #print(idx, type(idx))
+        # print(idx, type(idx))
         path = self.df.iloc[idx].image
         orig_img = Image.open(path)
         if self.tfms is not None:
@@ -191,7 +195,7 @@ class ImageDataset(Dataset):
             return img
 
 
-D = get_data(512, 512+128, 448, n_subs=100)
+D = get_data(512, 512 + 128, 448, n_subs=100)
 
 
 #####

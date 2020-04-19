@@ -1,6 +1,8 @@
-#############################################################
-######## START ALPHA ########################################
-#############################################################
+import numpy as np
+import torch
+
+from img_param import linear_decorrelate, rfft2d_freqs
+from objectives import Objective
 
 
 def to_valid_rgb(img, pre_correlation, post_correlation, decorrelate=False, train=True):
@@ -18,13 +20,13 @@ def to_valid_rgb(img, pre_correlation, post_correlation, decorrelate=False, trai
     if is_alpha:
         alpha = post_correlation(alpha)
         if train:
-            #background = torch.rand_like(img)
+            # background = torch.rand_like(img)
             b, ch, h, w = img.shape
             background = get_bg_img(
                 (b, ch, h, w), sd=0.2, decay_power=1.5).to(img.device)
         else:
             background = torch.zeros_like(img)
-            #background = torch.ones_like(img)
+            # background = torch.ones_like(img)
         img = img * alpha + background * (1 - alpha)
     return img
 
@@ -36,7 +38,7 @@ def get_bg_img(shape, sd=0.2, decay_power=1.5, decorrelate=True):
         freqs = rfft2d_freqs(h, w)
         fh, fw = freqs.shape
         spectrum_var = torch.normal(0, sd, (3, fh, fw, 2))
-        scale = np.sqrt(h*w) / np.maximum(freqs, 1./max(h, w))**decay_power
+        scale = np.sqrt(h * w) / np.maximum(freqs, 1. / max(h, w))**decay_power
 
         scaled_spectrum = spectrum_var * \
             torch.from_numpy(scale.reshape(1, *scale.shape, 1)).float()
@@ -59,8 +61,8 @@ def get_image(size, std, fft=False, dev='cuda:0', seed=124, decay_power=1., alph
         freq_size = (b, ch, *freqs.shape, 2)
         img = torch.normal(0, std, freq_size).to(dev).requires_grad_()
 
-        scale = (torch.tensor(np.sqrt(w*h) /
-                              np.maximum(freqs, 1./max(w, h)) ** decay_power))
+        scale = (torch.tensor(np.sqrt(w * h) /
+                              np.maximum(freqs, 1. / max(w, h)) ** decay_power))
         scale = scale.view(1, 1, *scale.shape, 1).float().to(dev)
 
         def pre_correlation(img):
@@ -76,12 +78,14 @@ def get_image(size, std, fft=False, dev='cuda:0', seed=124, decay_power=1., alph
 
     else:
         img = torch.normal(0, std, size).to(dev).requires_grad_()
-        def pre_correlation(x): return x
+
+        def pre_correlation(x):
+            return x
 
         def post_correlation(img):
             return torch.sigmoid(img)
     if alpha:
-        alpha_shape = (size[0], 1, *size[2:])
+        # alpha_shape = (size[0], 1, *size[2:])
         img_alpha = torch.normal(0, std, size).to(dev).requires_grad_()
         return [img, img_alpha], pre_correlation, post_correlation
     else:
@@ -105,7 +109,4 @@ class AlphaObjective(ImageObjective):
         self.alpha_channels = alpha_channels
 
     def _compute_loss(self):
-        return 1-self.alpha_channels.sigmoid().mean([-1, -2, -3])
-#############################################################
-######## END ALPHA ##########################################
-#############################################################
+        return 1 - self.alpha_channels.sigmoid().mean([-1, -2, -3])

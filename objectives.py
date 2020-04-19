@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import numpy as np
-
 import torch
 
 
@@ -113,7 +112,7 @@ class Channel(Objective):
     def _hook(self, module, input, output):
         # TODO check which one is correct/better!
         # TODO then propagate for all objectives!!
-        #self.output = output[:, self.channel, :, :]
+        # self.output = output[:, self.channel, :, :]
         self.output = output[:, self.channel, :, :].sum([-1, -2])
 
 

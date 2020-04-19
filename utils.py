@@ -1,5 +1,4 @@
 import numpy as np
-
 import torch
 from torch import nn
 
@@ -71,20 +70,22 @@ def build_spritemap(channel_imgs, border=0, int_format=False):
     '''
 
     if len(channel_imgs.shape) == 4:
-        sprite_size = ((n_rows-1)*(h+border) + h, (n_cols-1)*(w+border) + w, 3)
+        sprite_size = ((n_rows - 1) * (h + border) + h,
+                       (n_cols - 1) * (w + border) + w, 3)
     else:
-        sprite_size = ((n_rows-1)*(h+border) + h, (n_cols-1)*(w+border) + w)
+        sprite_size = ((n_rows - 1) * (h + border) + h,
+                       (n_cols - 1) * (w + border) + w)
     sprite = np.ones(sprite_size)
     i = j = 0
     for img in channel_imgs:
-        hh, hp = i*(h+border), i*(h+border) + h
-        ww, wp = j*(w+border), j*(w+border) + w
+        hh, hp = i * (h + border), i * (h + border) + h
+        ww, wp = j * (w + border), j * (w + border) + w
         sprite[hh:hp, ww:wp] = img
-        j = (j+1) % n_cols
+        j = (j + 1) % n_cols
         if j == 0:
             i += 1
     if int_format:
-        sprite = np.round(sprite*255).astype(np.uint8)
+        sprite = np.round(sprite * 255).astype(np.uint8)
     return sprite
 
 

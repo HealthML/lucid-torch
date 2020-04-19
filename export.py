@@ -1,4 +1,18 @@
-# TODO all imports
+import json
+import os
+from os.path import join
+
+import numpy as np
+import torch
+from matplotlib.pyplot import imsave
+from PIL import Image
+from torchvision.transforms import ToTensor
+from tqdm import tqdm
+
+from attribution import channel_attr_binary, prepare_layer_cams
+from base import render
+from objectives import Channel, FCNeuron
+from utils import build_spritemap, compute_layer, namify
 
 
 def export_full(
@@ -112,7 +126,7 @@ def export_full(
         img.save(out_p)
 
 
-def save_v4(paths, model, layer_func, path_to_json, first=3, sdir='.', size=(448, 448), dev='cuda:0'):
+def save_v4(paths, model, layer_func, path_to_json, first=3, size=(448, 448), dev='cuda:0'):
     for i, p in enumerate(paths):
         img = load_img(p, size, dev)
         sem_dict = prep_semantic_dicts(
@@ -120,9 +134,11 @@ def save_v4(paths, model, layer_func, path_to_json, first=3, sdir='.', size=(448
         with open(path_to_json % i, 'w') as f:
             json.dump(sem_dict, f)
 
+
 def prep_v2(model, n_epochs, paths, all_paths, size=(448, 448), dev='cuda:0'):
     # TODO rename
-    def final_layer_func(m): return m
+    def final_layer_func(m):
+        return m
     obj = FCNeuron(final_layer_func, neuron=0)
     n_images = len(paths)
 
@@ -218,36 +234,35 @@ def save_v2(model, n_epochs, paths, all_paths, sdir='.', size=(448, 448), dev='c
         os.mkdir(sdir)
 
     path_to_pos_act = join(sdir, 'pos_act.%s' % img_extension)
-    with open(path_to_pos_act, 'w') as f:
-        imsave(path_to_pos_act, pos_act)
+    # with open(path_to_pos_act, 'w') as f:
+    imsave(path_to_pos_act, pos_act)
 
     path_to_neg_act = join(sdir, 'neg_act.%s' % img_extension)
-    with open(path_to_neg_act, 'w') as f:
-        imsave(path_to_neg_act, neg_act)
+    # with open(path_to_neg_act, 'w') as f:
+    imsave(path_to_neg_act, neg_act)
 
     path_to_pos_act_init = join(sdir, 'pos_act_init.%s' % img_extension)
-    with open(path_to_pos_act_init, 'w') as f:
-        imsave(path_to_pos_act_init, pos_act_init)
+    # with open(path_to_pos_act_init, 'w') as f:
+    imsave(path_to_pos_act_init, pos_act_init)
 
     path_to_neg_act_init = join(sdir, 'neg_act_init.%s' % img_extension)
-    with open(path_to_neg_act_init, 'w') as f:
-        imsave(path_to_neg_act_init, neg_act_init)
+    # with open(path_to_neg_act_init, 'w') as f:
+    imsave(path_to_neg_act_init, neg_act_init)
 
     path_to_pos_act_img = join(sdir, 'pos_act_img.%s' % img_extension)
-    with open(path_to_pos_act_img, 'w') as f:
-        imsave(path_to_pos_act_img, pos_act_imgs)
+    # with open(path_to_pos_act_img, 'w') as f:
+    imsave(path_to_pos_act_img, pos_act_imgs)
 
     path_to_neg_act_img = join(sdir, 'neg_act_img.%s' % img_extension)
-    with open(path_to_neg_act_img, 'w') as f:
-        imsave(path_to_neg_act_img, neg_act_imgs)
-
+    # with open(path_to_neg_act_img, 'w') as f:
+    imsave(path_to_neg_act_img, neg_act_imgs)
 
 
 # been used in vis
 def prepare_layer(model, layer_func, n_epochs=250, size=(1, 3, 224, 224), dev='cuda:0'):
     # TODO rename
     '''compute feature visualizations for each channel in layer'''
-    b, ch, h, w = compute_layer(torch.normal(
+    _, ch, _, _ = compute_layer(torch.normal(
         0, 0.01, size), model, layer_func, dev)[0].shape
 
     channel_imgs = []
@@ -300,7 +315,7 @@ def prep_v1(paths, model, layer_func, size=(448, 448), dev='cuda:0'):
         As.append(A)
     # average importance for each channel
     As = np.array(As).mean(0)
-    #As = dict( (int(i), float(As[i])) for i in As.argsort(0)[::-1] )
+    # As = dict( (int(i), float(As[i])) for i in As.argsort(0)[::-1] )
     As = [
         {'channel': int(i), 'importance': float(As[i])}
         for i in As.argsort(0)[::-1]]
@@ -329,7 +344,7 @@ def prep_semantic_dicts(img, model, layer_func, first=0, dev='cuda:0'):
         values, inds = values[:first], inds[:first]
 
     rows, cols = act.shape[1:]
-    #{'pos': {'x': ..., 'y': ...}, 'activations': [{'channel': ..., 'value': ...}, ... ] }
+    # {'pos': {'x': ..., 'y': ...}, 'activations': [{'channel': ..., 'value': ...}, ... ] }
 
     all_acts = []
     for row in range(rows):

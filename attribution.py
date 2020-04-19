@@ -1,4 +1,8 @@
-# TODO all imports
+import numpy as np
+import torch
+
+from skimage.transform import resize as sk_resize
+from utils import compute_layer
 
 
 def channel_attr_binary(img, model, layer_func, target_class=torch.ones((1, 1)), dev='cuda:0'):
@@ -49,4 +53,3 @@ def prepare_layer_cams(img, model, layer_func, target_class=torch.ones((1, 1)), 
         cams = (cams - cams.min()) / (cams.max() - cams.min())
 
     return cams
-

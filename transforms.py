@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -36,7 +35,7 @@ class TFMSRandomScale(TFMS):
         self.mode = mode
 
     def __call__(self, img):
-        if not self.scales is None:
+        if self.scales is not None:
             scale = np.random.choice(self.scales)
         else:
             scale = self.rng[0] + \
@@ -75,7 +74,7 @@ class TFMSPad(TFMS):
 class TFMSRandomRotate(TFMS):
     def __init__(self, angles=None, rng=None):
         self.angles = angles
-        if not angles is None:
+        if angles is not None:
             self.rotations = []
             for a in angles:
                 self.rotations.append(TFMSRotateGPU(a))
@@ -84,7 +83,7 @@ class TFMSRandomRotate(TFMS):
             raise ValueError
 
     def __call__(self, img):
-        if not self.angles is None:
+        if self.angles is not None:
             rot = np.random.choice(self.rotations)
         else:
             angle = self.rng[0] + \
@@ -96,7 +95,7 @@ class TFMSRandomRotate(TFMS):
 
 class TFMSRotateGPU(TFMS):
     def __init__(self, angle=0):
-        self.angle = torch.tensor([angle*np.pi / 180])
+        self.angle = torch.tensor([angle * np.pi / 180])
         self.rot_matrix = torch.tensor([[torch.cos(self.angle), torch.sin(self.angle)],
                                         [-torch.sin(self.angle), torch.cos(self.angle)]])
         self.w = self.h = None
@@ -152,16 +151,16 @@ class TFMSBlur(TFMS):
 
 class TFMSGaussianBlur(TFMSBlur):
     def __init__(self, kernel_size=3, std=1):
-        ax = torch.linspace(-(kernel_size - 1)/2.,
+        ax = torch.linspace(-(kernel_size - 1) / 2.,
                             (kernel_size - 1) / 2, kernel_size)
         xx, yy = torch.meshgrid(ax, ax)
         kernel = torch.exp(-0.5 * (xx**2 + yy**2) / std**2)
-        super(TFMSGaussianBlur, self).__init__(kernel=kernel/kernel.sum())
+        super(TFMSGaussianBlur, self).__init__(kernel=kernel / kernel.sum())
 
 
 class TFMSRotate(TFMS):
     def __init__(self, angle=0):
-        self.angle = torch.tensor([angle*np.pi / 180])
+        self.angle = torch.tensor([angle * np.pi / 180])
         self.rot_matrix = torch.tensor([[torch.cos(self.angle), torch.sin(self.angle)],
                                         [-torch.sin(self.angle), torch.cos(self.angle)]])
 

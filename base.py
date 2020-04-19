@@ -1,20 +1,22 @@
-from utils import *
-from transforms import *
-from objectives import *
-from img_param import *
-from torchvision import models
-from torch import optim
-import torch
-from tqdm import tqdm
-from matplotlib import pyplot as plt
-import numpy as np
-from functools import partial
 import warnings
+from functools import partial
+
+import numpy as np
+import torch
+from matplotlib import pyplot as plt
+from torch import optim
+from tqdm import tqdm
+
+from img_param import get_image, init_from_image, to_valid_rgb
+from transforms import (TFMSCompose, TFMSJitter, TFMSNormalize, TFMSPad,
+                        TFMSRandomRotate, TFMSRandomScale)
+from utils import prep_model
+
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
 def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, decay_power=1, seed=42, dev='cpu', path=None, eps=1e-5):
-    if not path is None:
+    if path is not None:
         img, pre, post = init_from_image(
             path,
             size=size[-2:],
@@ -86,9 +88,9 @@ def render(model, objective, img_thres=(100,),
 
     imgs = []
     if verbose:
-        pbar = tqdm(range(1, max(img_thres)+1))
+        pbar = tqdm(range(1, max(img_thres) + 1))
     else:
-        pbar = range(1, max(img_thres)+1)
+        pbar = range(1, max(img_thres) + 1)
     for i in pbar:
         step(img, opt, objective, model, to_rgb, tfms)
         if verbose:
@@ -112,15 +114,15 @@ def plot_imgs(imgs):
     imgs: (batch, height, width, channels)
     '''
     n_img = imgs.shape[0]
-    if n_img < 17:
-        n_rows = [None, 1, 1, 2, 2, 2, 2, 3, 3,
-                  3,  3,  3,  3,  4,  4,  4,  4][n_img]
+    if n_img < 13:
+        n_rows = [None, 1, 1, 2, 2, 2, 2,
+                  3, 3, 3, 3, 3, 3][n_img]
     else:
         n_rows = 4
     n_cols = np.ceil(n_img / n_rows).astype(int)
     fig = plt.figure(figsize=(10, 10))
     for i, img in enumerate(imgs):
-        fig.add_subplot(n_rows,  n_cols, i+1)
+        fig.add_subplot(n_rows, n_cols, i + 1)
         plt.imshow(img)
 
 
@@ -128,7 +130,7 @@ def step(img, opt, obj, model, to_rgb, tfms):
     opt.zero_grad()
     # e.g. sigmoid, or inverse fft
     img = to_rgb(img)
-    if not tfms is None:
+    if tfms is not None:
         img = tfms(img)
     _ = model(img)
     obj.backward()
