@@ -1,7 +1,7 @@
 import numpy as np
-
 import torch
 from torch import nn
+
 
 def prep_model(model, dev):
     # TODO rename
@@ -32,9 +32,11 @@ def compute_layer(inp, model, layer_func, dev, include_grad=False, targets=None)
     '''
     model = prep_model(model, dev)
     output = []
-    hook = layer_func(model).register_forward_hook(lambda m, i, o: output.append(o.detach()))
+    hook = layer_func(model).register_forward_hook(
+        lambda m, i, o: output.append(o.detach()))
     if include_grad:
-        hook_backward = layer_func(model).register_backward_hook(lambda m, i, o: output.append(o))
+        hook_backward = layer_func(model).register_backward_hook(
+            lambda m, i, o: output.append(o))
 
     out = model(inp.to(dev))
 
@@ -45,6 +47,7 @@ def compute_layer(inp, model, layer_func, dev, include_grad=False, targets=None)
         hook_backward.remove()
 
     return output
+
 
 def build_spritemap(channel_imgs, border=0, int_format=False):
     # TODO rename to create_spritemap?
@@ -67,23 +70,24 @@ def build_spritemap(channel_imgs, border=0, int_format=False):
     '''
 
     if len(channel_imgs.shape) == 4:
-        sprite_size = ((n_rows-1)*(h+border) + h, (n_cols-1)*(w+border) + w, 3)
+        sprite_size = ((n_rows - 1) * (h + border) + h,
+                       (n_cols - 1) * (w + border) + w, 3)
     else:
-        sprite_size = ((n_rows-1)*(h+border) + h, (n_cols-1)*(w+border) + w)
+        sprite_size = ((n_rows - 1) * (h + border) + h,
+                       (n_cols - 1) * (w + border) + w)
     sprite = np.ones(sprite_size)
     i = j = 0
     for img in channel_imgs:
-        hh, hp = i*(h+border), i*(h+border) + h
-        ww, wp = j*(w+border), j*(w+border) + w
+        hh, hp = i * (h + border), i * (h + border) + h
+        ww, wp = j * (w + border), j * (w + border) + w
         sprite[hh:hp, ww:wp] = img
-        j = (j+1) % n_cols
+        j = (j + 1) % n_cols
         if j == 0:
             i += 1
     if int_format:
-        sprite = np.round(sprite*255).astype(np.uint8)
+        sprite = np.round(sprite * 255).astype(np.uint8)
     return sprite
 
 
 def namify(string):
     return '_'.join(string.split())
-
