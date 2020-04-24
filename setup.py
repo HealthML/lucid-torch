@@ -9,5 +9,5 @@ setup(
     packages=find_packages(),
     python_requires='>=3.7',
     install_requires=['torch', "numpy", "pandas", "pillow",
-                      "scipy", "torchvision", "tqdm", "scikit-image", "matplotlib"],
+                      "scipy", "torchvision", "tqdm", "scikit-image", "matplotlib", "kornia"],
 )

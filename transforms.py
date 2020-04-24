@@ -1,23 +1,21 @@
+from typing import Tuple, Union
+
+import kornia
 import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
 
 
-class TFMSNormalize(nn.Module):
+class TFMSNormalize(kornia.augmentation.Normalize):
     def __init__(self, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
-        super(TFMSNormalize, self).__init__()
-        self.mean = torch.tensor(mean)
-        self.std = torch.tensor(std)
-
-    def forward(self, img):
-        dev = img.device
-        self.mean, self.std = self.mean.to(dev), self.std.to(dev)
-        return (img - self.mean[..., None, None]) / self.std[..., None, None]
+        super(TFMSNormalize, self).__init__(
+            torch.tensor(mean),
+            torch.tensor(std))
 
 
 class TFMSRandomScale(nn.Module):
-    def __init__(self, scales=None, rng=None, mode='bilinear'):
+    def __init__(self, scales: Union[Tuple[float], None] = None, rng=None, mode='bilinear'):
         super(TFMSRandomScale, self).__init__()
         self.scales = scales
         self.rng = rng
@@ -64,6 +62,8 @@ class TFMSPad(nn.Module):
         return pad(img)
 
 
+# Kornia has a random rotate class but unfortinately its padding mode is set to 'zeros' and cannot be changed
+# TODO: Feature request in Kornia
 class TFMSRandomRotate(nn.Module):
     def __init__(self, angles=None, rng=None):
         super(TFMSRandomRotate, self).__init__()
@@ -71,7 +71,7 @@ class TFMSRandomRotate(nn.Module):
         if angles is not None:
             self.rotations = []
             for a in angles:
-                self.rotations.append(TFMSRotateGPU(a))
+                self.rotations.append(TFMSRotate(a))
         self.rng = rng
         if (angles is None) and (rng is None):
             raise ValueError
@@ -82,48 +82,30 @@ class TFMSRandomRotate(nn.Module):
         else:
             angle = self.rng[0] + \
                 (self.rng[1] - self.rng[0]) * np.random.rand()
-            rot = TFMSRotateGPU(angle)
-
+            rot = TFMSRotate(angle)
         return rot(img)
 
 
-class TFMSRotateGPU(nn.Module):
-    def __init__(self, angle=0):
-        super(TFMSRotateGPU, self).__init__()
-        self.angle = torch.tensor([angle * np.pi / 180])
-        self.rot_matrix = torch.tensor([[torch.cos(self.angle), torch.sin(self.angle)],
-                                        [-torch.sin(self.angle), torch.cos(self.angle)]])
-        self.w = self.h = None
+class TFMSRotate(nn.Module):
+    def __init__(self, angle=0, padding_mode='border', interpolation='nearest'):
+        super(TFMSRotate, self).__init__()
+        self.angle = torch.tensor([angle])
+        self.padding_mode = padding_mode
+        self.interpolation = interpolation
 
-    def _set_up(self, w, h, dev):
-        self.rot_matrix = self.rot_matrix.to(dev)
-        self.w, self.h = w, h
-        xx, yy = torch.meshgrid(torch.arange(
-            w, device=dev), torch.arange(h, device=dev))
-        xx, yy = xx.contiguous().float(), yy.contiguous().float()
-        xm, ym = (w + 1) / 2, (h + 1) / 2
-
-        inds = torch.cat([(xx - xm).view(-1, 1), (yy - ym).view(-1, 1)], dim=1)
-        inds = (self.rot_matrix @ inds.t()).round() + \
-            torch.tensor([[xm, ym]], device=dev).t()
-
-        inds[inds < 0] = 0.
-        inds[0, :][inds[0, :] >= w] = w - 1.
-        inds[1, :][inds[1, :] >= h] = h - 1.
-        self.inds = inds.long()
-        self.xx, self.yy = xx.long(), yy.long()
-
-    def forward(self, img):
-        w, h = img.shape[-2:]
-        dev = img.device
-        if not (self.w, self.h) == (w, h):
-            self._set_up(w, h, dev)
-
-        rot_img = torch.zeros_like(img)
-        rot_img[:, :, self.xx.view(-1), self.yy.view(-1)
-                ] = img[:, :, self.inds[0, :], self.inds[1, :]]
-
-        return rot_img
+    def forward(self, img: torch.Tensor):
+        b, c, w, h = img.shape
+        center = torch.tensor([[w, h]], dtype=torch.float) / 2
+        transformation_matrix = kornia.get_rotation_matrix2d(
+            center,
+            self.angle,
+            torch.ones(1))
+        return kornia.warp_affine(
+            img.float(),
+            transformation_matrix.expand(b, -1, -1).to(img.device),
+            dsize=(w, h),
+            flags=self.interpolation,
+            padding_mode=self.padding_mode)
 
 
 class TFMSGaussianNoise(nn.Module):
@@ -135,51 +117,6 @@ class TFMSGaussianNoise(nn.Module):
         return img + self.level * torch.randn_like(img)
 
 
-class TFMSBlur(nn.Module):
-    def __init__(self, kernel=torch.ones(3, 3)):
-        super(TFMSBlur, self).__init__()
-        self.kernel = kernel.view(1, 1, *kernel.shape).repeat(3, 1, 1, 1)
-        self.pad = kernel.shape[0] // 2
-
-    def forward(self, img):
-        self.kernel = self.kernel.to(img.device)
-        return F.conv2d(img, weight=self.kernel, groups=3, padding=self.pad)
-
-
-class TFMSGaussianBlur(TFMSBlur):
-    def __init__(self, kernel_size=3, std=1):
-        ax = torch.linspace(-(kernel_size - 1) / 2.,
-                            (kernel_size - 1) / 2, kernel_size)
-        xx, yy = torch.meshgrid(ax, ax)
-        kernel = torch.exp(-0.5 * (xx**2 + yy**2) / std**2)
-        super(TFMSGaussianBlur, self).__init__(kernel=kernel / kernel.sum())
-
-
-class TFMSRotate(nn.Module):
-    def __init__(self, angle=0):
-        super(TFMSRotate, self).__init__()
-        self.angle = torch.tensor([angle * np.pi / 180])
-        self.rot_matrix = torch.tensor([[torch.cos(self.angle), torch.sin(self.angle)],
-                                        [-torch.sin(self.angle), torch.cos(self.angle)]])
-
-    def forward(self, img):
-        w, h = img.shape[-2:]
-
-        xx, yy = torch.meshgrid(torch.arange(w), torch.arange(h))
-        xx, yy = xx.contiguous().float(), yy.contiguous().float()
-        xm, ym = (w + 1) / 2, (h + 1) / 2
-
-        inds = torch.cat([(xx - xm).view(-1, 1), (yy - ym).view(-1, 1)], dim=1)
-        inds = (self.rot_matrix @ inds.t()).round() + \
-            torch.tensor([[xm, ym]]).t()
-
-        inds[inds < 0] = 0.
-        inds[0, :][inds[0, :] >= w] = w - 1.
-        inds[1, :][inds[1, :] >= h] = h - 1.
-        inds = inds.long()
-
-        rot_img = torch.zeros_like(img)
-        rot_img[:, :, xx.view(-1).long(), yy.view(-1).long()
-                ] = img[:, :, inds[0, :], inds[1, :]]
-
-        return rot_img
+TFMSBoxBlur = kornia.filters.BoxBlur
+TFMSMedianBlur = kornia.filters.MedianBlur
+TFMSGaussianBlur = kornia.filters.GaussianBlur2d
