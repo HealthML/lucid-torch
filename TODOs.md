@@ -67,10 +67,6 @@ find image patches that most highly activate channels instead of optimize! --> e
 
 ## General
 
-### augmentation library
-
-use transformation library such as kornia or nvidia-dali instead of own ones (first benchmark; a lot of stuff is prob better on GPU than on CPU)
-
 ### check tfms
 
 include proper transformations for visualizations --> they should match what we trained with, not weird resizes

@@ -8,7 +8,7 @@ from torch import optim
 from tqdm import tqdm
 
 from img_param import get_image, init_from_image, to_valid_rgb
-from transforms import (TFMSCompose, TFMSJitter, TFMSNormalize, TFMSPad,
+from transforms import (TFMSJitter, TFMSNormalize, TFMSPad,
                         TFMSRandomRotate, TFMSRandomScale)
 from utils import prep_model
 
@@ -68,7 +68,7 @@ def tfms_from_param(tfm_param='default'):
     elif not isinstance(tfm_param, list):
         raise NotImplementedError
 
-    return TFMSCompose(tfm_param)
+    return torch.nn.Sequential(*tfm_param)
 
 
 def render(model, objective, img_thres=(100,),
