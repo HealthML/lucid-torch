@@ -4,6 +4,7 @@ from functools import partial
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
+from moviepy.video.io.ffmpeg_writer import FFMPEG_VideoWriter
 from torch import optim
 from tqdm import tqdm
 
@@ -75,6 +76,7 @@ def render(model, objective, img_thres=(100,),
            img_param={}, opt_param={}, tfm_param='default',
            seed=None, dev='cuda:0',
            verbose=True,
+           video=None
            ):
     if seed:
         torch.manual_seed(seed)
@@ -87,18 +89,32 @@ def render(model, objective, img_thres=(100,),
     tfms = tfms_from_param(tfm_param)
 
     imgs = []
+    video = open_video(video, img_param['size'][2:])
     if verbose:
         pbar = tqdm(range(1, max(img_thres) + 1))
     else:
         pbar = range(1, max(img_thres) + 1)
-    for i in pbar:
-        step(img, opt, objective, model, to_rgb, tfms)
-        if verbose:
-            with torch.no_grad():
-                pbar.set_description("Epoch %d, current loss: %.3f" % (
-                    i, objective._compute_loss()))
-        if i in img_thres:
-            imgs.append(to_rgb(img).detach().cpu().numpy())
+
+    def render_steps():
+        for i in pbar:
+            step(img, opt, objective, model, to_rgb, tfms)
+            if verbose:
+                with torch.no_grad():
+                    pbar.set_description("Epoch %d, current loss: %.3f" % (
+                        i, objective._compute_loss()))
+            if video is not None:
+                frame = to_rgb(
+                    img).detach().cpu().numpy()
+                video.write_frame(
+                    np.uint8(np.moveaxis(frame, 1, -1)[-1] * 255.0))
+            if i in img_thres:
+                imgs.append(to_rgb(img).detach().cpu().numpy())
+
+    if video is None:
+        render_steps()
+    else:
+        with video:
+            render_steps()
 
     imgs = np.moveaxis(np.array(imgs), 2, -1)
     if verbose:
@@ -106,6 +122,15 @@ def render(model, objective, img_thres=(100,),
 
     objective.remove_hook()
     return imgs
+
+
+def open_video(video=None, size=(224, 224)):
+    if video is not None:
+        if isinstance(video, str):
+            video = FFMPEG_VideoWriter(video, size, 60.0)
+        elif not isinstance(video, FFMPEG_VideoWriter):
+            raise NotImplementedError
+    return video
 
 
 def plot_imgs(imgs):
