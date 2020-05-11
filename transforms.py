@@ -137,3 +137,16 @@ class TFMSRandomBoxBlur(nn.Module):
             randint(self.min_kernel_size[1] // 2,
                     self.max_kernel_size[1] // 2) * 2 + 1
         ), border_type=self.border_type)(img)
+
+
+class TFMSAlpha(nn.Module):
+    def __init__(self, tfms):
+        super(TFMSAlpha, self).__init__()
+        self.tfms = tfms
+
+    def forward(self, img):
+        if len(img) == 2:
+            alpha = self.tfms(img[1].sigmoid())
+            return [img[0], torch.log(alpha / (1.0 - alpha))]
+        else:
+            return img
