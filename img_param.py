@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 import numpy as np
 import torch
 from PIL import Image
@@ -72,7 +74,7 @@ def init_from_image(paths, size=(224, 224), fft=False, dev='cuda:0', eps=1e-4):
     return imgs, pre_correlation, post_correlation
 
 
-def get_image(size, std, fft=False, dev='cuda:0', seed=124, decay_power=1.):
+def get_image(size, std, fft=False, dev='cuda:0', seed=124, decay_power=1., alpha=False):
     if fft:
         b, ch, h, w = size
         freqs = rfft2d_freqs(h, w)
@@ -102,7 +104,14 @@ def get_image(size, std, fft=False, dev='cuda:0', seed=124, decay_power=1.):
 
         def post_correlation(img):
             return torch.sigmoid(img)
-    return img, pre_correlation, post_correlation
+    if alpha:
+        alpha_shape = (size[0], 1, *size[2:])
+
+        img_alpha = torch.normal(-0.8, std,
+                                 alpha_shape).to(dev).requires_grad_()
+        return [img, img_alpha], pre_correlation, post_correlation
+    else:
+        return [img], pre_correlation, post_correlation
 
 
 def rfft2d_freqs(h, w):
@@ -115,13 +124,40 @@ def rfft2d_freqs(h, w):
     return np.sqrt(fx * fx + fy * fy)
 
 
-def to_valid_rgb(img, pre_correlation, post_correlation, decorrelate=False):
-    img = pre_correlation(img)
+class BackgroundStyle(Enum):
+    BLACK = auto()
+    WHITE = auto()
+    RAND = auto()
+    RAND_FREQ = auto()
 
+
+def to_valid_rgb(img, pre_correlation, post_correlation, decorrelate=False, background=BackgroundStyle.RAND_FREQ):
+    if len(img) == 2:
+        img, alpha = img
+        is_alpha = True
+    else:
+        img = img[0]
+        is_alpha = False
+    img = pre_correlation(img)
     if decorrelate:
         img = linear_decorrelate(img)
     img = post_correlation(img)
 
+    if is_alpha:
+        alpha = alpha.sigmoid()
+        if background is BackgroundStyle.BLACK:
+            background = torch.zeros_like(img)
+        elif background is BackgroundStyle.WHITE:
+            background = torch.ones_like(img)
+        elif background is BackgroundStyle.RAND:
+            background = torch.rand_like(img)
+        elif background is BackgroundStyle.RAND_FREQ:
+            b, ch, h, w = img.shape
+            background = get_bg_img(
+                (b, ch, h, w), sd=0.2, decay_power=1.5).to(img.device)
+        else:
+            raise NotImplementedError
+        img = img * alpha + background * (1 - alpha)
     return img
 
 
@@ -131,3 +167,25 @@ def linear_decorrelate(img):
     img = (img.reshape(-1, 3) @ cc_norm.t().to(img.device)).view(*img.shape)
     img = img.permute(0, 3, 1, 2)
     return img
+
+
+def get_bg_img(shape, sd=0.2, decay_power=1.5, decorrelate=True):
+    b, ch, h, w = shape
+    imgs = []
+    for _ in range(b):
+        freqs = rfft2d_freqs(h, w)
+        fh, fw = freqs.shape
+        spectrum_var = torch.normal(0, sd, (3, fh, fw, 2))
+        scale = np.sqrt(h * w) / np.maximum(freqs, 1. / max(h, w))**decay_power
+
+        scaled_spectrum = spectrum_var * \
+            torch.from_numpy(scale.reshape(1, *scale.shape, 1)).float()
+        img = torch.irfft(scaled_spectrum, signal_ndim=2)
+        img = img[:ch, :h, :w]
+        imgs.append(img)
+
+    # 4 for desaturation / better scale...
+    imgs = torch.stack(imgs) / 4
+    if decorrelate:
+        imgs = linear_decorrelate(imgs)
+    return imgs.sigmoid()

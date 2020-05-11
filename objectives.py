@@ -239,3 +239,25 @@ class Layer(Objective):
 
     def _hook(self, module, input, output):
         self.output = output[:, :, :, :]
+
+
+class ImageObjective(Objective):
+    def __init__(self):
+        super().__init__(None)
+
+    def register(self, model, img):
+        self.img = img
+
+    def remove_hook(self):
+        pass
+
+
+class MeanOpacity(ImageObjective):
+    def __init__(self):
+        super().__init__()
+
+    def _compute_loss(self):
+        if len(self.img) == 2:
+            return self.img[1].sigmoid().mean()
+        else:
+            return 1.0

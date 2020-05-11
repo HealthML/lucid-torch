@@ -8,15 +8,15 @@ from moviepy.video.io.ffmpeg_writer import FFMPEG_VideoWriter
 from torch import optim
 from tqdm import tqdm
 
-from img_param import get_image, init_from_image, to_valid_rgb
-from transforms import (TFMSJitter, TFMSNormalize, TFMSPad,
-                        TFMSRandomRotate, TFMSRandomScale)
+from img_param import BackgroundStyle, get_image, init_from_image, to_valid_rgb
+from transforms import (TFMSAlpha, TFMSJitter, TFMSNormalize, TFMSPad,
+                        TFMSRandomBoxBlur, TFMSRandomRotate, TFMSRandomScale)
 from utils import prep_model
 
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
-def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, decay_power=1, seed=42, dev='cpu', path=None, eps=1e-5):
+def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, decay_power=1, seed=42, dev='cpu', path=None, eps=1e-5, alpha=False):
     if path is not None:
         img, pre, post = init_from_image(
             path,
@@ -33,6 +33,7 @@ def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, 
             decay_power=decay_power,
             seed=seed,
             dev=dev,
+            alpha=alpha
         )
     to_rgb = partial(to_valid_rgb,
                      pre_correlation=pre, post_correlation=post, decorrelate=decorrelate)
@@ -41,7 +42,7 @@ def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, 
 
 def opt_from_param(img, opt='adam', lr=0.05, eps=1e-7, wd=0.):
     if opt == 'adam':
-        opt = optim.Adam([img], lr=lr, eps=1e-7, weight_decay=wd)
+        opt = optim.Adam(img, lr=lr, eps=1e-7, weight_decay=wd)
     else:
         raise NotImplementedError
     return opt
@@ -72,8 +73,22 @@ def tfms_from_param(tfm_param='default'):
     return torch.nn.Sequential(*tfm_param)
 
 
+def alpha_tfms_from_param(alpha_tfm_param):
+    if alpha_tfm_param is None:
+        return None
+    if isinstance(alpha_tfm_param, str) and alpha_tfm_param == 'default':
+        alpha_tfm_param = [
+            TFMSRandomBoxBlur((11, 11), (51, 51), border_type='constant')
+        ]
+    elif not isinstance(alpha_tfm_param, list):
+        raise NotImplementedError
+
+    return TFMSAlpha(torch.nn.Sequential(*alpha_tfm_param))
+
+
 def render(model, objective, img_thres=(100,),
            img_param={}, opt_param={}, tfm_param='default',
+           alpha_tfm_param='default',
            seed=None, dev='cuda:0',
            verbose=True,
            video=None
@@ -83,9 +98,10 @@ def render(model, objective, img_thres=(100,),
 
     model = prep_model(model, dev)
     img, to_rgb = img_from_param(dev=dev, **img_param)
-    objective.register(model, img)
     opt = opt_from_param(img, **opt_param)
     tfms = tfms_from_param(tfm_param)
+    alpha_tfms = alpha_tfms_from_param(alpha_tfm_param)
+    objective.register(model, img)
 
     imgs = []
     video = open_video(video, img_param['size'][2:])
@@ -96,18 +112,19 @@ def render(model, objective, img_thres=(100,),
 
     def render_steps():
         for i in pbar:
-            step(img, opt, objective, model, to_rgb, tfms)
+            step(img, opt, objective, model, to_rgb, tfms, alpha_tfms)
             if verbose:
                 with torch.no_grad():
                     pbar.set_description("Epoch %d, current loss: %.3f" % (
                         i, objective._compute_loss()))
             if video is not None:
                 frame = to_rgb(
-                    img).detach().cpu().numpy()
+                    img, background=BackgroundStyle.WHITE).detach().cpu().numpy()
                 video.write_frame(
                     np.uint8(np.moveaxis(frame, 1, -1)[-1] * 255.0))
             if i in img_thres:
-                imgs.append(to_rgb(img).detach().cpu().numpy())
+                imgs.append(
+                    to_rgb(img, background=BackgroundStyle.WHITE).detach().cpu().numpy())
 
     if video is None:
         render_steps()
@@ -150,8 +167,10 @@ def plot_imgs(imgs):
         plt.imshow(img)
 
 
-def step(img, opt, obj, model, to_rgb, tfms):
+def step(img, opt, obj, model, to_rgb, tfms, alpha_tfms):
     opt.zero_grad()
+    if alpha_tfms is not None:
+        img = alpha_tfms(img)
     # e.g. sigmoid, or inverse fft
     img = to_rgb(img)
     if tfms is not None:
