@@ -37,7 +37,7 @@ class Objective(ABC):
         if isinstance(other, (int, float)):
             return JointObjective([self], [other])
         else:
-            raise NotImplementedError
+            return MultObjective([self, other])
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -70,6 +70,14 @@ class JointObjective(Objective):
         loss = 0.
         for w, o in zip(self.weights, self.objectives):
             loss += w * o._compute_loss()
+        return loss
+
+
+class MultObjective(JointObjective):
+    def _compute_loss(self):
+        loss = 1.0
+        for o in self.objectives:
+            loss = o._compute_loss() * loss
         return loss
 
 
