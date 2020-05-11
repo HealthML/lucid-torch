@@ -96,7 +96,7 @@ class ImageObjective(Objective):
     def __init__(self):
         super().__init__(None)
 
-    def register(self, model):
+    def register(self, model, img):
         pass
 
     def remove_hook(self):

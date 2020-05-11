@@ -82,9 +82,8 @@ def render(model, objective, img_thres=(100,),
         torch.manual_seed(seed)
 
     model = prep_model(model, dev)
-    objective.register(model)
-
     img, to_rgb = img_from_param(dev=dev, **img_param)
+    objective.register(model, img)
     opt = opt_from_param(img, **opt_param)
     tfms = tfms_from_param(tfm_param)
 

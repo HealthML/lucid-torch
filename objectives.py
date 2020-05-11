@@ -8,7 +8,7 @@ class Objective(ABC):
     def __init__(self, get_layer):
         self.get_layer = get_layer
 
-    def register(self, model):
+    def register(self, model, img):
         self.layer_hook = self.get_layer(
             model).register_forward_hook(self._hook)
 
@@ -66,9 +66,9 @@ class JointObjective(Objective):
         else:
             self.weights = weights
 
-    def register(self, model):
+    def register(self, model, img):
         for obj in self.objectives:
-            obj.register(model)
+            obj.register(model, img)
 
     def remove_hook(self):
         for obj in self.objectives:
@@ -100,7 +100,7 @@ class ConstObjective(Objective):
     def backward(self):
         raise NotImplementedError
 
-    def register(self, model):
+    def register(self, model, img):
         pass
 
     def remove_hook(self):
