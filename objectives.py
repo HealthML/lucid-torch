@@ -5,7 +5,6 @@ import torch
 
 
 class Objective(ABC):
-    # TODO make sum([obj1, obj2, ...]) work
     def __init__(self, get_layer):
         self.get_layer = get_layer
 
@@ -25,12 +24,16 @@ class Objective(ABC):
         val.backward()
 
     def __add__(self, other):
+        if isinstance(other, (int, float)):
+            other = ConstObjective(other)
         return JointObjective([self, other])
 
     def __neg__(self):
         return JointObjective([self], [-1.])
 
     def __sub__(self, other):
+        if isinstance(other, (int, float)):
+            other = ConstObjective(other)
         return JointObjective([self, other], [1., -1.])
 
     def __mul__(self, other):
@@ -44,6 +47,11 @@ class Objective(ABC):
 
     def __radd__(self, other):
         return self.__add__(other)
+
+    def __rsub__(self, other):
+        if isinstance(other, (int, float)):
+            other = ConstObjective(other)
+        return JointObjective([other, self], [1., -1.])
 
     def _hook(self, module, input, output):
         pass
@@ -79,6 +87,27 @@ class MultObjective(JointObjective):
         for o in self.objectives:
             loss = o._compute_loss() * loss
         return loss
+
+
+class ConstObjective(Objective):
+    def __init__(self, const):
+        super().__init__(None)
+        if isinstance(const, (float, int)):
+            self.const = const
+        else:
+            raise NotImplementedError
+
+    def backward(self):
+        raise NotImplementedError
+
+    def register(self, model):
+        pass
+
+    def remove_hook(self):
+        pass
+
+    def _compute_loss(self):
+        return self.const
 
 
 class ConvNeuron(Objective):
