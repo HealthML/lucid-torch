@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from img_param import BackgroundStyle, get_image, init_from_image, to_valid_rgb
 from transforms import (TFMSAlpha, TFMSJitter, TFMSNormalize, TFMSPad,
-                        TFMSRandomBoxBlur, TFMSRandomRotate, TFMSRandomScale)
+                        TFMSRandomGaussBlur, TFMSRandomRotate, TFMSRandomScale)
 from utils import prep_model
 
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -78,7 +78,8 @@ def alpha_tfms_from_param(alpha_tfm_param):
         return None
     if isinstance(alpha_tfm_param, str) and alpha_tfm_param == 'default':
         alpha_tfm_param = [
-            TFMSRandomBoxBlur((11, 11), (51, 51), border_type='constant')
+            TFMSRandomGaussBlur((13, 13), (31, 31),
+                                (5, 5), (17, 17), border_type='constant')
         ]
     elif not isinstance(alpha_tfm_param, list):
         raise NotImplementedError
