@@ -1,12 +1,12 @@
 import warnings
 from functools import partial
-
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
 from moviepy.video.io.ffmpeg_writer import FFMPEG_VideoWriter
 from torch import optim
 from tqdm import tqdm
+from IPython import display
 
 from img_param import BackgroundStyle, get_image, init_from_image, to_valid_rgb
 from transforms import (TFMSAlpha, TFMSJitter, TFMSNormalize, TFMSPad,
@@ -123,6 +123,9 @@ def render(model, objective, img_thres=(100,),
                     img, background=BackgroundStyle.WHITE).detach().cpu().numpy()
                 video.write_frame(
                     np.uint8(np.moveaxis(frame, 1, -1)[-1] * 255.0))
+            if i % 40 == 0:
+                plot_imgs(np.moveaxis(to_rgb(
+                    img, background=BackgroundStyle.WHITE).detach().cpu().numpy(), 1, -1))
             if i in img_thres:
                 imgs.append(
                     to_rgb(img, background=BackgroundStyle.WHITE).detach().cpu().numpy())
@@ -163,9 +166,11 @@ def plot_imgs(imgs):
         n_rows = 4
     n_cols = np.ceil(n_img / n_rows).astype(int)
     fig = plt.figure(figsize=(10, 10))
+    display.clear_output(wait=True)
     for i, img in enumerate(imgs):
         fig.add_subplot(n_rows, n_cols, i + 1)
         plt.imshow(img)
+        display.display(plt.gcf())
 
 
 def step(img, opt, obj, model, to_rgb, tfms, alpha_tfms):
