@@ -71,7 +71,7 @@ def alpha(dev='cuda:0'):
     alpha = MeanOpacity()
     obj = obj * (1.0 - alpha)
 
-    img_param = {'size': (1, 3, 512, 512), 'fft': True,
+    img_param = {'size': (1, 3, 224, 224), 'fft': True,
                  'decorrelate': True,
                  'alpha': True}
 
