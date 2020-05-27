@@ -92,7 +92,7 @@ def render(model, objective, img_thres=(100,),
            alpha_tfm_param='default',
            seed=None, dev='cuda:0',
            verbose=True,
-           video=None
+           video=None, display_video=40,
            ):
     if seed:
         torch.manual_seed(seed)
@@ -123,7 +123,7 @@ def render(model, objective, img_thres=(100,),
                     img, background=BackgroundStyle.WHITE).detach().cpu().numpy()
                 video.write_frame(
                     np.uint8(np.moveaxis(frame, 1, -1)[-1] * 255.0))
-            if i % 40 == 0:
+            if display_video and i % display_video == 0:
                 plot_imgs(np.moveaxis(to_rgb(
                     img, background=BackgroundStyle.WHITE).detach().cpu().numpy(), 1, -1))
             if i in img_thres:
@@ -166,7 +166,7 @@ def plot_imgs(imgs):
         n_rows = 4
     n_cols = np.ceil(n_img / n_rows).astype(int)
     fig = plt.figure(figsize=(10, 10))
-    display.clear_output(wait=True)
+    display.clear_output(wait=False)
     for i, img in enumerate(imgs):
         fig.add_subplot(n_rows, n_cols, i + 1)
         plt.imshow(img)
