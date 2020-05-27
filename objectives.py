@@ -5,11 +5,10 @@ import torch
 
 
 class Objective(ABC):
-    # TODO make sum([obj1, obj2, ...]) work
     def __init__(self, get_layer):
         self.get_layer = get_layer
 
-    def register(self, model):
+    def register(self, model, img):
         self.layer_hook = self.get_layer(
             model).register_forward_hook(self._hook)
 
@@ -25,25 +24,34 @@ class Objective(ABC):
         val.backward()
 
     def __add__(self, other):
+        if isinstance(other, (int, float)):
+            other = ConstObjective(other)
         return JointObjective([self, other])
 
     def __neg__(self):
         return JointObjective([self], [-1.])
 
     def __sub__(self, other):
+        if isinstance(other, (int, float)):
+            other = ConstObjective(other)
         return JointObjective([self, other], [1., -1.])
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
             return JointObjective([self], [other])
         else:
-            raise NotImplementedError
+            return MultObjective([self, other])
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __radd__(self, other):
         return self.__add__(other)
+
+    def __rsub__(self, other):
+        if isinstance(other, (int, float)):
+            other = ConstObjective(other)
+        return JointObjective([other, self], [1., -1.])
 
     def _hook(self, module, input, output):
         pass
@@ -58,9 +66,9 @@ class JointObjective(Objective):
         else:
             self.weights = weights
 
-    def register(self, model):
+    def register(self, model, img):
         for obj in self.objectives:
-            obj.register(model)
+            obj.register(model, img)
 
     def remove_hook(self):
         for obj in self.objectives:
@@ -71,6 +79,35 @@ class JointObjective(Objective):
         for w, o in zip(self.weights, self.objectives):
             loss += w * o._compute_loss()
         return loss
+
+
+class MultObjective(JointObjective):
+    def _compute_loss(self):
+        loss = 1.0
+        for o in self.objectives:
+            loss = o._compute_loss() * loss
+        return loss
+
+
+class ConstObjective(Objective):
+    def __init__(self, const):
+        super().__init__(None)
+        if isinstance(const, (float, int)):
+            self.const = const
+        else:
+            raise NotImplementedError
+
+    def backward(self):
+        raise NotImplementedError
+
+    def register(self, model, img):
+        pass
+
+    def remove_hook(self):
+        pass
+
+    def _compute_loss(self):
+        return self.const
 
 
 class ConvNeuron(Objective):
@@ -202,3 +239,25 @@ class Layer(Objective):
 
     def _hook(self, module, input, output):
         self.output = output[:, :, :, :]
+
+
+class ImageObjective(Objective):
+    def __init__(self):
+        super().__init__(None)
+
+    def register(self, model, img):
+        self.img = img
+
+    def remove_hook(self):
+        pass
+
+
+class MeanOpacity(ImageObjective):
+    def __init__(self):
+        super().__init__()
+
+    def _compute_loss(self):
+        if len(self.img) == 2:
+            return self.img[1].sigmoid().mean()
+        else:
+            return 1.0

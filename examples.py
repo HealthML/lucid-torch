@@ -1,7 +1,7 @@
 from torchvision import models
 
 from base import render
-from objectives import Channel, ConvNeuron, FCNeuron
+from objectives import Channel, ConvNeuron, FCNeuron, MeanOpacity
 
 
 def basic(dev='cuda:0'):
@@ -60,5 +60,33 @@ def objective(dev='cuda:0'):
         tfm_param=tfm_param,
         dev=dev,
         verbose=True,
+    )
+    return imgs
+
+
+def alpha(dev='cuda:0'):
+    M = models.resnet18(pretrained=True)
+
+    obj = FCNeuron(lambda m: m.fc, neuron=234)
+    alpha = MeanOpacity()
+    obj = obj * (1.0 - alpha)
+
+    img_param = {'size': (1, 3, 224, 224), 'fft': True,
+                 'decorrelate': True,
+                 'alpha': True}
+
+    tfm_param = 'default_norm'
+    alpha_tfm_param = 'default'
+
+    imgs = render(
+        M,
+        obj,
+        img_thres=(1000,),
+        img_param=img_param,
+        tfm_param=tfm_param,
+        alpha_tfm_param=alpha_tfm_param,
+        dev=dev,
+        verbose=True,
+        video='alpha.mp4'
     )
     return imgs

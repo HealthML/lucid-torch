@@ -1,3 +1,4 @@
+from random import randint
 from typing import Tuple, Union
 
 import kornia
@@ -120,3 +121,55 @@ class TFMSGaussianNoise(nn.Module):
 TFMSBoxBlur = kornia.filters.BoxBlur
 TFMSMedianBlur = kornia.filters.MedianBlur
 TFMSGaussianBlur = kornia.filters.GaussianBlur2d
+
+
+class TFMSRandomBoxBlur(nn.Module):
+    def __init__(self, min_kernel_size=(11, 11), max_kernel_size=(51, 51), border_type='reflect'):
+        super(TFMSRandomBoxBlur, self).__init__()
+        self.min_kernel_size = min_kernel_size
+        self.max_kernel_size = max_kernel_size
+        self.border_type = border_type
+
+    def forward(self, img):
+        return TFMSBoxBlur((
+            randint(self.min_kernel_size[0] // 2,
+                    self.max_kernel_size[0] // 2) * 2 + 1,
+            randint(self.min_kernel_size[1] // 2,
+                    self.max_kernel_size[1] // 2) * 2 + 1
+        ), border_type=self.border_type)(img)
+
+
+class TFMSRandomGaussBlur(nn.Module):
+    def __init__(self, min_kernel_size=(11, 11), max_kernel_size=(51, 51), min_sigma=(3, 3), max_sigma=(21, 21), border_type='reflect'):
+        super(TFMSRandomGaussBlur, self).__init__()
+        self.min_kernel_size = min_kernel_size
+        self.max_kernel_size = max_kernel_size
+        self.border_type = border_type
+        self.min_sigma = min_sigma
+        self.max_sigma = max_sigma
+
+    def forward(self, img):
+        return TFMSGaussianBlur((
+            randint(self.min_kernel_size[0] // 2,
+                    self.max_kernel_size[0] // 2) * 2 + 1,
+            randint(self.min_kernel_size[1] // 2,
+                    self.max_kernel_size[1] // 2) * 2 + 1
+        ), (
+            randint(self.min_sigma[0],
+                    self.max_sigma[0]),
+            randint(self.min_sigma[1],
+                    self.max_sigma[1])
+        ), border_type=self.border_type)(img)
+
+
+class TFMSAlpha(nn.Module):
+    def __init__(self, tfms):
+        super(TFMSAlpha, self).__init__()
+        self.tfms = tfms
+
+    def forward(self, img):
+        if len(img) == 2:
+            alpha = self.tfms(img[1].sigmoid())
+            return [img[0], torch.log(alpha / (1.0 - alpha))]
+        else:
+            return img

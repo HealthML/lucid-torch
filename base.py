@@ -1,21 +1,22 @@
 import warnings
 from functools import partial
-
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
+from moviepy.video.io.ffmpeg_writer import FFMPEG_VideoWriter
 from torch import optim
 from tqdm import tqdm
+from IPython import display
 
-from img_param import get_image, init_from_image, to_valid_rgb
-from transforms import (TFMSJitter, TFMSNormalize, TFMSPad,
-                        TFMSRandomRotate, TFMSRandomScale)
+from img_param import BackgroundStyle, get_image, init_from_image, to_valid_rgb
+from transforms import (TFMSAlpha, TFMSJitter, TFMSNormalize, TFMSPad,
+                        TFMSRandomGaussBlur, TFMSRandomRotate, TFMSRandomScale)
 from utils import prep_model
 
 warnings.filterwarnings('ignore', category=UserWarning)
 
 
-def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, decay_power=1, seed=42, dev='cpu', path=None, eps=1e-5):
+def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, decay_power=1, seed=42, dev='cpu', path=None, eps=1e-5, alpha=False):
     if path is not None:
         img, pre, post = init_from_image(
             path,
@@ -32,6 +33,7 @@ def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, 
             decay_power=decay_power,
             seed=seed,
             dev=dev,
+            alpha=alpha
         )
     to_rgb = partial(to_valid_rgb,
                      pre_correlation=pre, post_correlation=post, decorrelate=decorrelate)
@@ -40,7 +42,7 @@ def img_from_param(size=(1, 3, 128, 128), std=0.01, fft=True, decorrelate=True, 
 
 def opt_from_param(img, opt='adam', lr=0.05, eps=1e-7, wd=0.):
     if opt == 'adam':
-        opt = optim.Adam([img], lr=lr, eps=1e-7, weight_decay=wd)
+        opt = optim.Adam(img, lr=lr, eps=1e-7, weight_decay=wd)
     else:
         raise NotImplementedError
     return opt
@@ -71,34 +73,68 @@ def tfms_from_param(tfm_param='default'):
     return torch.nn.Sequential(*tfm_param)
 
 
+def alpha_tfms_from_param(alpha_tfm_param):
+    if alpha_tfm_param is None:
+        return None
+    if isinstance(alpha_tfm_param, str) and alpha_tfm_param == 'default':
+        alpha_tfm_param = [
+            TFMSRandomGaussBlur((13, 13), (31, 31),
+                                (5, 5), (17, 17), border_type='constant')
+        ]
+    elif not isinstance(alpha_tfm_param, list):
+        raise NotImplementedError
+
+    return TFMSAlpha(torch.nn.Sequential(*alpha_tfm_param))
+
+
 def render(model, objective, img_thres=(100,),
            img_param={}, opt_param={}, tfm_param='default',
+           alpha_tfm_param='default',
            seed=None, dev='cuda:0',
            verbose=True,
+           video=None, display_video=40,
            ):
     if seed:
         torch.manual_seed(seed)
 
     model = prep_model(model, dev)
-    objective.register(model)
-
     img, to_rgb = img_from_param(dev=dev, **img_param)
     opt = opt_from_param(img, **opt_param)
     tfms = tfms_from_param(tfm_param)
+    alpha_tfms = alpha_tfms_from_param(alpha_tfm_param)
+    objective.register(model, img)
 
     imgs = []
+    video = open_video(video, img_param['size'][2:])
     if verbose:
         pbar = tqdm(range(1, max(img_thres) + 1))
     else:
         pbar = range(1, max(img_thres) + 1)
-    for i in pbar:
-        step(img, opt, objective, model, to_rgb, tfms)
-        if verbose:
-            with torch.no_grad():
-                pbar.set_description("Epoch %d, current loss: %.3f" % (
-                    i, objective._compute_loss()))
-        if i in img_thres:
-            imgs.append(to_rgb(img).detach().cpu().numpy())
+
+    def render_steps():
+        for i in pbar:
+            step(img, opt, objective, model, to_rgb, tfms, alpha_tfms)
+            if verbose:
+                with torch.no_grad():
+                    pbar.set_description("Epoch %d, current loss: %.3f" % (
+                        i, objective._compute_loss()))
+            if video is not None:
+                frame = to_rgb(
+                    img, background=BackgroundStyle.WHITE).detach().cpu().numpy()
+                video.write_frame(
+                    np.uint8(np.moveaxis(frame, 1, -1)[-1] * 255.0))
+            if display_video and i % display_video == 0:
+                plot_imgs(np.moveaxis(to_rgb(
+                    img, background=BackgroundStyle.WHITE).detach().cpu().numpy(), 1, -1))
+            if i in img_thres:
+                imgs.append(
+                    to_rgb(img, background=BackgroundStyle.WHITE).detach().cpu().numpy())
+
+    if video is None:
+        render_steps()
+    else:
+        with video:
+            render_steps()
 
     imgs = np.moveaxis(np.array(imgs), 2, -1)
     if verbose:
@@ -106,6 +142,15 @@ def render(model, objective, img_thres=(100,),
 
     objective.remove_hook()
     return imgs
+
+
+def open_video(video=None, size=(224, 224)):
+    if video is not None:
+        if isinstance(video, str):
+            video = FFMPEG_VideoWriter(video, size, 60.0)
+        elif not isinstance(video, FFMPEG_VideoWriter):
+            raise NotImplementedError
+    return video
 
 
 def plot_imgs(imgs):
@@ -121,13 +166,17 @@ def plot_imgs(imgs):
         n_rows = 4
     n_cols = np.ceil(n_img / n_rows).astype(int)
     fig = plt.figure(figsize=(10, 10))
+    display.clear_output(wait=False)
     for i, img in enumerate(imgs):
         fig.add_subplot(n_rows, n_cols, i + 1)
         plt.imshow(img)
+        display.display(plt.gcf())
 
 
-def step(img, opt, obj, model, to_rgb, tfms):
+def step(img, opt, obj, model, to_rgb, tfms, alpha_tfms):
     opt.zero_grad()
+    if alpha_tfms is not None:
+        img = alpha_tfms(img)
     # e.g. sigmoid, or inverse fft
     img = to_rgb(img)
     if tfms is not None:
