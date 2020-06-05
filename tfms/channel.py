@@ -1,5 +1,6 @@
+from typing import List, Union
+
 import torch
-from typing import Union, List
 
 
 class TFMSTransformChannels(torch.nn.Module):
@@ -7,10 +8,7 @@ class TFMSTransformChannels(torch.nn.Module):
         super(TFMSTransformChannels, self).__init__()
         if isinstance(channels, (list, int)):
             if isinstance(channels, int):
-                if channels < 0:
-                    raise ValueError()
-                else:
-                    channels = [channels]
+                channels = [channels]
             channels = torch.Tensor(channels)
         elif not isinstance(channels, torch.Tensor):
             raise TypeError()
@@ -20,4 +18,8 @@ class TFMSTransformChannels(torch.nn.Module):
         self.tfms = tfms
 
     def forward(self, data: torch.Tensor):
-        return data.index_copy(1, self.channels, self.tfms(data[:, self.channels]))
+        self.channels = self.channels.to(data.device)
+        transformed = self.tfms(data[:, self.channels])
+        data = data.clone()
+        data[:, self.channels] = transformed
+        return data

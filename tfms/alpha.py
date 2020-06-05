@@ -1,5 +1,7 @@
 from enum import Enum, auto
+
 import torch
+
 from image.random import rand_fft
 
 
