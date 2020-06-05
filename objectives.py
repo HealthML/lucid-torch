@@ -1,4 +1,5 @@
 from abc import ABC
+from image.ImageBatch import ImageBatch
 
 import numpy as np
 import torch
@@ -7,21 +8,24 @@ import torch
 class Objective(ABC):
     def __init__(self, get_layer):
         self.get_layer = get_layer
+        self.imageBatch = None
 
-    def register(self, model, img):
+    def register(self, model):
         self.layer_hook = self.get_layer(
             model).register_forward_hook(self._hook)
 
     def remove_hook(self):
         self.layer_hook.remove()
 
-    def _compute_loss(self):
+    def _compute_loss(self, imageBatch: ImageBatch):
+        self.imageBatch = imageBatch
         loss = -1 * self.output.mean()
         return loss
 
-    def backward(self):
-        val = self._compute_loss()
-        val.backward()
+    def backward(self, imageBatch: ImageBatch):
+        loss = self._compute_loss(imageBatch)
+        loss.backward()
+        return loss.item()
 
     def __add__(self, other):
         if isinstance(other, (int, float)):
@@ -66,26 +70,28 @@ class JointObjective(Objective):
         else:
             self.weights = weights
 
-    def register(self, model, img):
+    def register(self, model):
         for obj in self.objectives:
-            obj.register(model, img)
+            obj.register(model)
 
     def remove_hook(self):
         for obj in self.objectives:
             obj.remove_hook()
 
-    def _compute_loss(self):
+    def _compute_loss(self, imageBatch):
+        self.imageBatch = imageBatch
         loss = 0.
         for w, o in zip(self.weights, self.objectives):
-            loss += w * o._compute_loss()
+            loss += w * o._compute_loss(self.imageBatch)
         return loss
 
 
 class MultObjective(JointObjective):
-    def _compute_loss(self):
+    def _compute_loss(self, imageBatch):
+        self.imageBatch = imageBatch
         loss = 1.0
         for o in self.objectives:
-            loss = o._compute_loss() * loss
+            loss = o._compute_loss(self.imageBatch) * loss
         return loss
 
 
@@ -97,16 +103,17 @@ class ConstObjective(Objective):
         else:
             raise NotImplementedError
 
-    def backward(self):
+    def backward(self, imageBatch: ImageBatch):
         raise NotImplementedError
 
-    def register(self, model, img):
+    def register(self, model):
         pass
 
     def remove_hook(self):
         pass
 
-    def _compute_loss(self):
+    def _compute_loss(self, imageBatch):
+        self.imageBatch = imageBatch
         return self.const
 
 
@@ -162,7 +169,8 @@ class DirectionChannel(Objective):
     def _hook(self, module, input, output):
         self.output = output[:, :, :, :]
 
-    def _compute_loss(self):
+    def _compute_loss(self, imageBatch):
+        self.imageBatch = imageBatch
         self.direction = self.direction.to(self.output.device)
         n_neurons = self.output.shape[-1] * self.output.shape[-2]
         output = self.output.sum(-1).sum(-1) / n_neurons
@@ -245,19 +253,20 @@ class ImageObjective(Objective):
     def __init__(self):
         super().__init__(None)
 
-    def register(self, model, img):
-        self.img = img
+    def register(self, model):
+        pass
 
     def remove_hook(self):
         pass
 
 
 class MeanOpacity(ImageObjective):
-    def __init__(self):
+    def __init__(self, unit_space_tfms: torch.nn.Module):
         super().__init__()
+        self.unit_space_tfms = unit_space_tfms
 
-    def _compute_loss(self):
-        if len(self.img) == 2:
-            return self.img[1].sigmoid().mean()
-        else:
-            return 1.0
+    def _compute_loss(self, imageBatch):
+        self.imageBatch = imageBatch
+        unmodified = self.imageBatch.unmodified()
+        opacity = unmodified.transform(self.unit_space_tfms).data[-1]
+        return opacity.sigmoid().mean()
