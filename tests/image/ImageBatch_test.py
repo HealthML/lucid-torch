@@ -42,7 +42,7 @@ class TestImageBatch:
 
     def test_init_converts_parameters_to_tensor(self):
         def assert_converts(unconverted, converted: torch.Tensor):
-            assert converted.equal(ImageBatch(unconverted).data)
+            assert converted.float().equal(ImageBatch(unconverted).data.float())
         _float = 0.5
         _int = 2
         _list = [0.2, 0.3, 0.4]
@@ -63,7 +63,7 @@ class TestImageBatch:
 
     def test_load_loads_image(self, example_image):
         imageBatch = ImageBatch.load(EXAMPLE_IMAGE_PATH)
-        assert example_image.equal(imageBatch.data[0])
+        assert torch.all((example_image == imageBatch.data[0]))
 
     def test_load_applies_transforms(self):
         testData = torch.Tensor([-123.4, 567.8])
