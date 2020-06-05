@@ -1,6 +1,6 @@
 import pytest
 import torch
-from transforms.fft import TFMSFFT, TFMSIFFT
+from tfms.fft import TFMSFFT, TFMSIFFT
 from image.ImageBatch import ImageBatch
 
 

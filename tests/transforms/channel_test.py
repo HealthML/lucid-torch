@@ -1,5 +1,5 @@
 from image.ImageBatch import ImageBatch
-from transforms.channel import TFMSTransformChannels
+from tfms.channel import TFMSTransformChannels
 import pytest
 import torch
 
@@ -12,8 +12,6 @@ class TFMSPlusTwo(torch.nn.Module):
 class Test_TFMSTransformChannels:
     # region __init__
     def test_init_raises_error_on_invalid_parameters(self):
-        with pytest.raises(ValueError):
-            TFMSTransformChannels(-2, torch.nn.Identity())
         with pytest.raises(TypeError):
             TFMSTransformChannels(0.4, torch.nn.Identity())
         with pytest.raises(TypeError):
