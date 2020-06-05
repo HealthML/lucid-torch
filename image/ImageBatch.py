@@ -1,9 +1,12 @@
+import warnings
 from typing import Iterable, Union
 
 import numpy as np
 import PIL
 import torch
 from torchvision.transforms import ToTensor
+
+warnings.filterwarnings('ignore', category=UserWarning)
 
 
 class ImageBatch:
@@ -28,18 +31,17 @@ class ImageBatch:
         data.shape = (batch, channels, height, width)
         """
         if isinstance(data, float):
-            self.data = torch.Tensor([data])
+            self.data = torch.tensor([data])
         elif isinstance(data, int):
-            self.data = torch.Tensor([data])
+            self.data = torch.tensor([data])
         elif isinstance(data, list):
-            self.data = torch.Tensor(data)
+            self.data = torch.tensor(data)
         elif isinstance(data, np.ndarray):
             self.data = torch.from_numpy(data)
         elif isinstance(data, torch.Tensor):
             self.data = data
         else:
             raise TypeError()
-        self.data.requires_grad_()
 
     @staticmethod
     def load(paths: Union[str, Iterable[str]],
@@ -88,7 +90,9 @@ class ImageBatch:
         elif not isinstance(data_space_transform, torch.nn.Module):
             raise TypeError()
 
-        data = torch.normal(0, std, (batch_size, channels, height, width))
+        data = torch.normal(0.5,
+                            std,
+                            (batch_size, channels, height, width)).clamp(0.0, 1.0)
         return ImageBatch(data_space_transform(data))
 
     def unmodified(self):
@@ -98,6 +102,11 @@ class ImageBatch:
         if not isinstance(transforms, torch.nn.Module):
             raise TypeError()
         return ModifiedImageBatch(transforms(self.data), self)
+
+    def to(self, device):
+        self.data = torch.tensor(
+            self.data, device=device, requires_grad=True, dtype=torch.float)
+        return self
 
 
 class ModifiedImageBatch(ImageBatch):
