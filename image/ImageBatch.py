@@ -30,14 +30,12 @@ class ImageBatch:
         """
         data.shape = (batch, channels, height, width)
         """
-        if isinstance(data, float):
-            self.data = torch.tensor([data])
-        elif isinstance(data, int):
-            self.data = torch.tensor([data])
-        elif isinstance(data, list):
-            self.data = torch.tensor(data)
-        elif isinstance(data, np.ndarray):
-            self.data = torch.from_numpy(data)
+        if isinstance(data, (float, int)):
+            self.data = torch.tensor(
+                [data], requires_grad=True, dtype=torch.float)
+        elif isinstance(data, (list, np.ndarray)):
+            self.data = torch.tensor(
+                data, requires_grad=True, dtype=torch.float)
         elif isinstance(data, torch.Tensor):
             self.data = data
         else:
@@ -60,7 +58,7 @@ class ImageBatch:
             img = PIL.Image.open(path).convert('RGB')
             data.append(ToTensor()(img).view(1, 3, img.height, img.width))
         data = torch.cat(data)
-        return ImageBatch(data_space_transform(data))
+        return ImageBatch(data_space_transform(data)).to('cpu')
 
     @staticmethod
     def generate(
@@ -93,7 +91,7 @@ class ImageBatch:
         data = torch.normal(0.5,
                             std,
                             (batch_size, channels, height, width)).clamp(0.0, 1.0)
-        return ImageBatch(data_space_transform(data))
+        return ImageBatch(data_space_transform(data)).to('cpu')
 
     def unmodified(self):
         return self
