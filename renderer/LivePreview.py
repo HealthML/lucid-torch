@@ -17,7 +17,7 @@ class RendererLivePreview(RendererObserver):
         self.skipped = numberSkipsBetweenUpdates
 
     def __draw(self, renderer: Renderer):
-        imgs = renderer.drawableImage()
+        imgs = renderer.drawableImageBatch()
         imgs = imgs.data.detach().cpu().numpy()
         imgs = np.moveaxis(imgs, 1, -1)
         n_img = imgs.shape[0]
@@ -35,7 +35,7 @@ class RendererLivePreview(RendererObserver):
         display.display(plt.gcf())
 
     def onStartRender(self, renderer: Renderer, numberOfFrames: int):
-        self.numberSkipsBetweenUpdates = self.numberSkipsBetweenUpdates
+        self.skipped = self.numberSkipsBetweenUpdates
 
     def onStopRender(self, renderer: Renderer):
         self.__draw(renderer)

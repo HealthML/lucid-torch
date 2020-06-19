@@ -41,4 +41,4 @@ def alpha(device="cuda:0"):
                           .build()
                           )
     renderer.render(1000)
-    return renderer.drawableImage()
+    return renderer.drawableImageBatch().data

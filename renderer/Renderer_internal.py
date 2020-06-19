@@ -48,7 +48,7 @@ class Renderer:
             self.__frame()
         self.__stopRender()
 
-    def drawableImage(self):
+    def drawableImageBatch(self):
         drawable = self.imageBatch.transform(self.drawTFMS)
         return drawable
 

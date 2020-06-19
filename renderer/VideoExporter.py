@@ -35,7 +35,7 @@ class RendererVideoExporter(RendererObserver):
         self.video.close()
 
     def onFrame(self, renderer: Renderer):
-        drawData = renderer.drawableImageBatch()
+        drawData = renderer.drawableImageBatch().data
         drawData = drawData[0]
         drawData = drawData.data.detach().cpu().numpy()
         drawData = np.moveaxis(drawData, 0, -1)
