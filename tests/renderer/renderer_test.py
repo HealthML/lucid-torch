@@ -9,50 +9,6 @@ from renderer.Renderer import RendererBuilder
 from renderer.VideoExporter import RendererVideoExporter
 
 
-# region fixtures
-@pytest.fixture
-def imageBatch():
-    return ImageBatch.generate()
-
-
-@pytest.fixture
-def model():
-    return torch.nn.Identity()
-
-
-@pytest.fixture
-def optimizer(imageBatch):
-    return torch.optim.Adam([imageBatch.data])
-
-
-@pytest.fixture
-def objective():
-    return ConstObjective(0)
-
-
-@pytest.fixture
-def trainTFMS():
-    return torch.nn.Identity()
-
-
-@pytest.fixture
-def drawTFMS():
-    return torch.nn.Identity()
-
-
-@pytest.fixture
-def basicRendererBuilder(imageBatch, model, optimizer, objective, trainTFMS, drawTFMS):
-    return (RendererBuilder()
-            .imageBatch(imageBatch)
-            .model(model)
-            .optimizer(optimizer)
-            .objective(objective)
-            .trainTFMS(trainTFMS)
-            .drawTFMS(drawTFMS))
-
-# endregion fixtures
-
-
 class TestRendererBuilder:
     # region imageBatch
     def test_imageBatchRaisesErrorOnInvalidParameter(self):
