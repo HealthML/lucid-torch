@@ -31,11 +31,13 @@ class Renderer:
         if not isinstance(observer, RendererObserver):
             raise TypeError()
         self.observers.append(observer)
+        return self
 
     def remove_observer(self, observer: RendererObserver):
         if not isinstance(observer, RendererObserver):
             raise TypeError()
         self.observers.remove(observer)
+        return self
 
     def render(self, numberOfFrames: int):
         if not isinstance(numberOfFrames, int):
@@ -47,6 +49,7 @@ class Renderer:
         for _ in range(numberOfFrames):
             self.__frame()
         self.__stopRender()
+        return self
 
     def drawableImageBatch(self):
         drawable = self.imageBatch.transform(self.drawTFMS)
