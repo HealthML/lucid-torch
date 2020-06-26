@@ -1,6 +1,6 @@
 # Lucid Torch
 
-![Tests](https://github.com/mkirchler/feature-visualization/workflows/Test%20+%20Lint/badge.svg)
+![Tests](https://github.com/mkirchler/feature-visualization/workflows/Tests/badge.svg)
 
 ## Setup
 
