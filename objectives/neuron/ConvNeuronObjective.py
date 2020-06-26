@@ -1,6 +1,6 @@
 import numpy as np
 
-from Objective import Objective
+from objectives.Objective import Objective
 
 
 class ConvNeuronObjective(Objective):

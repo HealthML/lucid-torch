@@ -1,6 +1,6 @@
 import torch
 
-from ImageObjective import ImageObjective
+from objectives.image.ImageObjective import ImageObjective
 
 
 class MeanOpacityObjective(ImageObjective):

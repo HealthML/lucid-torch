@@ -4,13 +4,13 @@ import torch
 from image.ImageBatch import ImageBatch
 from renderer.Renderer import RendererBuilder
 from objectives.image.MeanOpacityObjective import MeanOpacityObjective
-from objectives.neuron import FCNeuronObjective
+from objectives.neuron.FCNeuronObjective import FCNeuronObjective
 from tfms import presets
 from tfms.unit_space import TFMSTrainingToUnitSpace
 from tfms.fft import TFMSIFFT
 
 
-def alpha(device="cuda:0"):
+def alpha(device="cuda:0", numberOfFrames=1):
     model = models.resnet18(pretrained=True)
 
     fcneuron = FCNeuronObjective(lambda m: m.fc, neuron=234)
@@ -40,5 +40,5 @@ def alpha(device="cuda:0"):
                 .withProgressBar()
                 .build()
                 )
-    renderer.render(1000)
+    renderer.render(numberOfFrames)
     return renderer.drawableImageBatch().data

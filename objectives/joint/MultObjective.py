@@ -1,4 +1,4 @@
-from JointObjective import JointObjective
+from objectives.joint.JointObjective import JointObjective
 
 
 class MultObjective(JointObjective):

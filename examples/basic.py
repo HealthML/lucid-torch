@@ -3,11 +3,11 @@ import torch
 
 from image.ImageBatch import ImageBatch
 from renderer.Renderer import RendererBuilder
-from objectives import ChannelObjective
+from objectives.channel.ChannelObjective import ChannelObjective
 from tfms import presets
 
 
-def basic(device="cuda:0"):
+def basic(device="cuda:0", numberOfFrames=1):
     model = models.resnet18(pretrained=True)
 
     # look into 3rd layer, 10th channel; this changes a lot between architectures
@@ -38,5 +38,5 @@ def basic(device="cuda:0"):
                 .withProgressBar()
                 .build()
                 )
-    renderer.render(1000)
+    renderer.render(numberOfFrames)
     return renderer.drawableImageBatch().data

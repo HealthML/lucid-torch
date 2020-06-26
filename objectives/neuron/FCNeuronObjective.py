@@ -1,4 +1,4 @@
-from Objective import Objective
+from objectives.Objective import Objective
 
 
 class FCNeuronObjective(Objective):

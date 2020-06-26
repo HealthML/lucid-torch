@@ -30,7 +30,7 @@ class TFMSRandomScale(nn.Module):
         else:
             scale = self.rng[0] + \
                 (self.rng[1] - self.rng[0]) * np.random.rand()
-        return F.interpolate(img, scale_factor=scale, mode=self.mode, align_corners=False)
+        return F.interpolate(img, scale_factor=scale, mode=self.mode, align_corners=False, recompute_scale_factor=True)
 
 
 class TFMSJitter(nn.Module):

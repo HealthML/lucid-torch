@@ -1,6 +1,6 @@
 import torch
 
-from Objective import Objective
+from objectives.Objective import Objective
 
 
 class DirectionChannelObjective(Objective):
