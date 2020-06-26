@@ -13,52 +13,52 @@ from renderer.VideoExporter import RendererVideoExporter
 
 class RendererBuilder:
     def __init__(self):
-        self.__imageBatch = None
-        self.__model = None
-        self.__optimizer = None
-        self.__objective = None
-        self.__trainTFMS = presets.trainTFMS()
-        self.__drawTFMS = presets.drawTFMS()
-        self.__videoFileName = None
-        self.__fps = None
-        self.__progressBar = True
-        self.__livePreview = False
-        self.__numberSkipsBetweenUpdates = None
+        self._imageBatch = None
+        self._model = None
+        self._optimizer = None
+        self._objective = None
+        self._trainTFMS = presets.trainTFMS()
+        self._drawTFMS = presets.drawTFMS()
+        self._videoFileName = None
+        self._fps = None
+        self._progressBar = True
+        self._livePreview = False
+        self._numberSkipsBetweenUpdates = None
 
     def imageBatch(self, imageBatch: ImageBatch):
         if not isinstance(imageBatch, ImageBatch):
             raise TypeError()
-        self.__imageBatch = imageBatch
+        self._imageBatch = imageBatch
         return self
 
     def model(self, model: torch.nn.Module):
         if not isinstance(model, torch.nn.Module):
             raise TypeError()
-        self.__model = model
+        self._model = model
         return self
 
     def optimizer(self, optimizer: torch.optim.Optimizer):
         if not isinstance(optimizer, torch.optim.Optimizer):
             raise TypeError()
-        self.__optimizer = optimizer
+        self._optimizer = optimizer
         return self
 
     def objective(self, objective: Objective):
         if not isinstance(objective, Objective):
             raise TypeError()
-        self.__objective = objective
+        self._objective = objective
         return self
 
     def trainTFMS(self, transforms: torch.nn.Module):
         if not isinstance(transforms, torch.nn.Module):
             raise TypeError()
-        self.__trainTFMS = transforms
+        self._trainTFMS = transforms
         return self
 
     def drawTFMS(self, transforms: torch.nn.Module):
         if not isinstance(transforms, torch.nn.Module):
             raise TypeError()
-        self.__drawTFMS = transforms
+        self._drawTFMS = transforms
         return self
 
     def exportVideo(self, filename: Union[None, str], fps=60):
@@ -68,14 +68,14 @@ class RendererBuilder:
             raise TypeError()
         elif fps < 1:
             raise ValueError()
-        self.__videoFileName = filename
-        self.__fps = fps
+        self._videoFileName = filename
+        self._fps = fps
         return self
 
     def withProgressBar(self, progressBar: bool = True):
         if not isinstance(progressBar, bool):
             raise TypeError()
-        self.__progressBar = progressBar
+        self._progressBar = progressBar
         return self
 
     def withLivePreview(self, livePreview: bool = True, numberSkipsBetweenUpdates: int = 50):
@@ -85,50 +85,50 @@ class RendererBuilder:
             raise TypeError()
         elif numberSkipsBetweenUpdates < 0:
             raise ValueError()
-        self .__livePreview = livePreview
-        self.__numberSkipsBetweenUpdates = numberSkipsBetweenUpdates
+        self ._livePreview = livePreview
+        self._numberSkipsBetweenUpdates = numberSkipsBetweenUpdates
         return self
 
-    def __assertAllRequiredAttributesPresent(self):
-        if self.__imageBatch is None:
+    def _assertAllRequiredAttributesPresent(self):
+        if self._imageBatch is None:
             raise AttributeError()
-        if self.__model is None:
+        if self._model is None:
             raise AttributeError()
-        if self.__objective is None:
+        if self._objective is None:
             raise AttributeError()
 
-    def __get_optimizer(self):
-        if self.__optimizer is None:
-            return torch.optim.Adam([self.__imageBatch.data],
+    def _get_optimizer(self):
+        if self._optimizer is None:
+            return torch.optim.Adam([self._imageBatch.data],
                                     lr=0.05,
                                     eps=1e-7,
                                     weight_decay=0.0)
         else:
-            return self.__optimizer
+            return self._optimizer
 
-    def __createRenderer(self):
-        return Renderer(self.__imageBatch,
-                        self.__model,
-                        self.__get_optimizer(),
-                        self.__objective,
-                        self.__trainTFMS,
-                        self.__drawTFMS)
+    def _createRenderer(self):
+        return Renderer(self._imageBatch,
+                        self._model,
+                        self._get_optimizer(),
+                        self._objective,
+                        self._trainTFMS,
+                        self._drawTFMS)
 
-    def __applyOptionalAttributes(self, renderer: Renderer):
-        if self.__videoFileName is not None:
+    def _applyOptionalAttributes(self, renderer: Renderer):
+        if self._videoFileName is not None:
             renderer.add_observer(
-                RendererVideoExporter(self.__videoFileName,
-                                      self.__imageBatch.width,
-                                      self.__imageBatch.height,
-                                      self.__fps))
-        if self.__progressBar:
+                RendererVideoExporter(self._videoFileName,
+                                      self._imageBatch.width,
+                                      self._imageBatch.height,
+                                      self._fps))
+        if self._progressBar:
             renderer.add_observer(RendererProgressBar())
-        if self.__livePreview:
+        if self._livePreview:
             renderer.add_observer(RendererLivePreview(
-                self.__numberSkipsBetweenUpdates))
+                self._numberSkipsBetweenUpdates))
 
     def build(self) -> Renderer:
-        self.__assertAllRequiredAttributesPresent()
-        renderer = self.__createRenderer()
-        self.__applyOptionalAttributes(renderer)
+        self._assertAllRequiredAttributesPresent()
+        renderer = self._createRenderer()
+        self._applyOptionalAttributes(renderer)
         return renderer

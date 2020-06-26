@@ -22,9 +22,9 @@ class TFMSFFT(torch.nn.Module):
         self.scale = None
 
     def forward(self, data: torch.Tensor):
-        return torch.rfft(data, signal_ndim=2) / self.__updateScale(data)
+        return torch.rfft(data, signal_ndim=2) / self._updateScale(data)
 
-    def __updateScale(self, data: torch.Tensor):
+    def _updateScale(self, data: torch.Tensor):
         h = data.shape[2]
         w = data.shape[3]
         if (self.h != h) or (self.w != w):
@@ -46,12 +46,12 @@ class TFMSIFFT(torch.nn.Module):
         self.scale = None
 
     def forward(self, data: torch.Tensor):
-        data = self.__updateScale(data) * data
+        data = self._updateScale(data) * data
         return torch.irfft(data,
                            signal_ndim=2,
                            signal_sizes=(self.h, self.w))
 
-    def __updateScale(self, data: torch.Tensor):
+    def _updateScale(self, data: torch.Tensor):
         h = data.shape[2]
         w = data.shape[3] * 2 - 2
         if (self.h != h) or (self.w != w):

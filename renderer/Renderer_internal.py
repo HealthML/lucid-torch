@@ -22,7 +22,7 @@ class Renderer:
         self.trainTFMS = trainTFMS
         self.drawTFMS = drawTFMS
         self.observers = []
-        self.__loss = 0
+        self._loss = 0
 
     def __del__(self):
         self.objective.remove_hook()
@@ -45,10 +45,10 @@ class Renderer:
         if numberOfFrames < 1:
             raise ValueError()
 
-        self.__startRender(numberOfFrames)
+        self._startRender(numberOfFrames)
         for _ in range(numberOfFrames):
-            self.__frame()
-        self.__stopRender()
+            self._frame()
+        self._stopRender()
         return self
 
     def drawableImageBatch(self):
@@ -56,21 +56,21 @@ class Renderer:
         return drawable
 
     def loss(self):
-        return self.__loss
+        return self._loss
 
-    def __startRender(self, numberOfFrames: int):
+    def _startRender(self, numberOfFrames: int):
         for observer in self.observers:
             observer.onStartRender(self, numberOfFrames)
 
-    def __frame(self):
+    def _frame(self):
         self.optimizer.zero_grad()
         transformedImageBatch = self.imageBatch.transform(self.trainTFMS)
         self.model(transformedImageBatch.data)
-        self.__loss = self.objective.backward(transformedImageBatch)
+        self._loss = self.objective.backward(transformedImageBatch)
         self.optimizer.step()
         for observer in self.observers:
             observer.onFrame(self)
 
-    def __stopRender(self):
+    def _stopRender(self):
         for observer in self.observers:
             observer.onStopRender(self)
