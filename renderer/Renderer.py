@@ -2,6 +2,7 @@ from typing import Union
 
 import torch
 
+import tfms.presets as presets
 from image.ImageBatch import ImageBatch
 from objectives.Objective import Objective
 from renderer.LivePreview import RendererLivePreview
@@ -16,12 +17,12 @@ class RendererBuilder:
         self.__model = None
         self.__optimizer = None
         self.__objective = None
-        self.__trainTFMS = None
-        self.__drawTFMS = None
+        self.__trainTFMS = presets.trainTFMS()
+        self.__drawTFMS = presets.drawTFMS()
         self.__videoFileName = None
         self.__fps = None
-        self.__progressBar = None
-        self.__livePreview = None
+        self.__progressBar = True
+        self.__livePreview = False
         self.__numberSkipsBetweenUpdates = None
 
     def imageBatch(self, imageBatch: ImageBatch):
@@ -93,19 +94,22 @@ class RendererBuilder:
             raise AttributeError()
         if self.__model is None:
             raise AttributeError()
-        if self.__optimizer is None:
-            raise AttributeError()
         if self.__objective is None:
             raise AttributeError()
-        if self.__trainTFMS is None:
-            raise AttributeError()
-        if self.__drawTFMS is None:
-            raise AttributeError()
+
+    def __get_optimizer(self):
+        if self.__optimizer is None:
+            return torch.optim.Adam([self.__imageBatch.data],
+                                    lr=0.05,
+                                    eps=1e-7,
+                                    weight_decay=0.0)
+        else:
+            return self.__optimizer
 
     def __createRenderer(self):
         return Renderer(self.__imageBatch,
                         self.__model,
-                        self.__optimizer,
+                        self.__get_optimizer(),
                         self.__objective,
                         self.__trainTFMS,
                         self.__drawTFMS)
@@ -117,11 +121,9 @@ class RendererBuilder:
                                       self.__imageBatch.width,
                                       self.__imageBatch.height,
                                       self.__fps))
-
-        if (self.__progressBar is not None) and self.__progressBar:
+        if self.__progressBar:
             renderer.add_observer(RendererProgressBar())
-
-        if (self.__livePreview is not None):
+        if self.__livePreview:
             renderer.add_observer(RendererLivePreview(
                 self.__numberSkipsBetweenUpdates))
 

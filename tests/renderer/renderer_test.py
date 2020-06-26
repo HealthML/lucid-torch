@@ -80,15 +80,15 @@ class TestRendererBuilder:
         with pytest.raises(TypeError):
             RendererBuilder().withProgressBar(32)
 
-    def test_withProgressBarAddsProgressBar(self, basicRendererBuilder):
-        renderer = basicRendererBuilder.withProgressBar().build()
-        assert next((observer for observer in renderer.observers
-                     if isinstance(observer, RendererProgressBar)), None) is not None
-
-    def test_noProgressBarByDefault(self, basicRendererBuilder):
-        renderer = basicRendererBuilder.build()
+    def test_withNoProgressBarRemovesProgressBar(self, basicRendererBuilder):
+        renderer = basicRendererBuilder.withProgressBar(False).build()
         assert next((observer for observer in renderer.observers
                      if isinstance(observer, RendererProgressBar)), None) is None
+
+    def test_hasProgressBarByDefault(self, basicRendererBuilder):
+        renderer = basicRendererBuilder.build()
+        assert next((observer for observer in renderer.observers
+                     if isinstance(observer, RendererProgressBar)), None) is not None
     # endregion
 
     # region withLivePreview
@@ -110,55 +110,29 @@ class TestRendererBuilder:
     # endregion
 
     # region build
-    def test_buildRaisesErrorIfNotAllRequiredAttributesSpecified(self, imageBatch, model, optimizer, objective, trainTFMS, drawTFMS):
+    def test_buildRaisesErrorIfNotAllRequiredAttributesSpecified(self, imageBatch, model, objective):
         with pytest.raises(AttributeError):
             (RendererBuilder()
              .model(model)
-             .optimizer(optimizer)
              .objective(objective)
-             .trainTFMS(trainTFMS)
-             .drawTFMS(drawTFMS)
              .build())
         with pytest.raises(AttributeError):
             (RendererBuilder()
              .imageBatch(imageBatch)
-             .optimizer(optimizer)
              .objective(objective)
-             .trainTFMS(trainTFMS)
-             .drawTFMS(drawTFMS)
              .build())
         with pytest.raises(AttributeError):
             (RendererBuilder()
              .imageBatch(imageBatch)
              .model(model)
-             .objective(objective)
-             .trainTFMS(trainTFMS)
-             .drawTFMS(drawTFMS)
              .build())
-        with pytest.raises(AttributeError):
-            (RendererBuilder()
-             .imageBatch(imageBatch)
-             .model(model)
-             .optimizer(optimizer)
-             .trainTFMS(trainTFMS)
-             .drawTFMS(drawTFMS)
-             .build())
-        with pytest.raises(AttributeError):
-            (RendererBuilder()
-             .imageBatch(imageBatch)
-             .model(model)
-             .optimizer(optimizer)
-             .objective(objective)
-             .drawTFMS(drawTFMS)
-             .build())
-        with pytest.raises(AttributeError):
-            (RendererBuilder()
-             .imageBatch(imageBatch)
-             .model(model)
-             .optimizer(optimizer)
-             .objective(objective)
-             .trainTFMS(trainTFMS)
-             .build())
+
+    def test_buildRaisesNoErrorIfAllRequiredAttributesAreSpecified(self, imageBatch, model, objective):
+        (RendererBuilder()
+            .imageBatch(imageBatch)
+            .model(model)
+            .objective(objective)
+            .build())
 
     def test_buildConstructsRendererWithCorrectObjects(self, imageBatch, model, optimizer, objective, trainTFMS, drawTFMS):
         renderer = (RendererBuilder()
