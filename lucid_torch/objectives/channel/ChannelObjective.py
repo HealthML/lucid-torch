@@ -1,4 +1,4 @@
-from lucid_torch.objectives.Objective import Objective
+from lucid_torch.objectives import Objective
 
 
 class ChannelObjective(Objective):

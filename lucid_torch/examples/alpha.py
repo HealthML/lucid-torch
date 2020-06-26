@@ -1,13 +1,14 @@
-from torchvision import models
 import torch
+from torchvision import models
 
-from lucid_torch.image.ImageBatch import ImageBatch
-from lucid_torch.renderer.Renderer import RendererBuilder
-from lucid_torch.objectives.image.MeanOpacityObjective import MeanOpacityObjective
-from lucid_torch.objectives.neuron.FCNeuronObjective import FCNeuronObjective
+from lucid_torch.image import ImageBatch
+from lucid_torch.objectives.image import MeanOpacityObjective
+from lucid_torch.objectives.neuron import FCNeuronObjective
+from lucid_torch.renderer import RendererBuilder
 from lucid_torch.transforms import presets
-from lucid_torch.transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
-from lucid_torch.transforms.fft.TFMSIFFT import TFMSIFFT
+from lucid_torch.transforms.fft import TFMSIFFT
+from lucid_torch.transforms.unit_space.TFMSTrainingToUnitSpace import \
+    TFMSTrainingToUnitSpace
 
 
 def alpha(device="cuda:0", numberOfFrames=500):

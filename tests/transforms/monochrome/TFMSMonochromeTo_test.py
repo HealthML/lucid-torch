@@ -1,7 +1,7 @@
 import pytest
 
-from lucid_torch.image.ImageBatch import ImageBatch
-from lucid_torch.transforms.monochrome.TFMSMonochromeTo import TFMSMonochromeTo
+from lucid_torch.image import ImageBatch
+from lucid_torch.transforms.monochrome import TFMSMonochromeTo
 
 
 class TestTFMSMonochromeTo:

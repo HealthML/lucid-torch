@@ -1,6 +1,6 @@
 import torch
 
-from lucid_torch.transforms.fft.scale import fft_scale
+from .scale import fft_scale
 
 
 class TFMSIFFT(torch.nn.Module):

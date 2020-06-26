@@ -6,11 +6,11 @@ import pandas as pd
 import torch
 from PIL import Image
 from scipy.stats import pearsonr
+from skimage.transform import resize as sk_resize
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from tqdm import tqdm
 
-from skimage.transform import resize as sk_resize
 from utils import prep_model
 
 warnings.filterwarnings('ignore', category=UserWarning)

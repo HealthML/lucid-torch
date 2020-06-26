@@ -1,5 +1,5 @@
-from lucid_torch.image.ImageBatch import ImageBatch
-from lucid_torch.transforms.channels.TFMSTransformChannels import TFMSTransformChannels
+from lucid_torch.image import ImageBatch
+from lucid_torch.transforms.channels import TFMSTransformChannels
 import pytest
 import torch
 

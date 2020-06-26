@@ -1,6 +1,6 @@
 import torch
 
-from lucid_torch.objectives.image.ImageObjective import ImageObjective
+from .ImageObjective import ImageObjective
 
 
 class MeanOpacityObjective(ImageObjective):

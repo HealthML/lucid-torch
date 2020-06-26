@@ -4,7 +4,7 @@ import torch
 import torchvision
 import PIL
 
-from lucid_torch.image.ImageBatch import ImageBatch
+from lucid_torch.image import ImageBatch
 
 # region test image
 EXAMPLE_IMAGE_PATH = 'tests/image/example_image.png'

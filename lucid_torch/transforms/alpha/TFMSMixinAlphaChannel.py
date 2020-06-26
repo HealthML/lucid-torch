@@ -1,7 +1,8 @@
 import torch
 
-from lucid_torch.transforms.alpha.BackgroundStyle import BackgroundStyle
 from lucid_torch.image.random import rand_fft
+
+from .BackgroundStyle import BackgroundStyle
 
 
 class TFMSMixinAlphaChannel(torch.nn.Module):

@@ -1,5 +1,6 @@
-from lucid_torch.image.ImageBatch import ImageBatch
-from lucid_torch.objectives.Objective import Objective
+from lucid_torch.image import ImageBatch
+
+from .Objective import Objective
 
 
 class ConstObjective(Objective):

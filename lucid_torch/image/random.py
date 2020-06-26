@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 
-from lucid_torch.image.color import linear_decorrelate
-from lucid_torch.image.spatial import rfft2d_freqs
+from .color import linear_decorrelate
+from .spatial import rfft2d_freqs
 
 
 def rand_fft(shape, std=0.2, decay_power=1.5, decorrelate=True):

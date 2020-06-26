@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from lucid_torch.transforms.stability.rotate.TFMSRotate import TFMSRotate
+from .TFMSRotate import TFMSRotate
 
 # Kornia has a random rotate class but unfortinately its padding mode is set to 'zeros' and cannot be changed
 # TODO: Feature request in Kornia

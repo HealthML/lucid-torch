@@ -1,22 +1,15 @@
 import torch
 
-from lucid_torch.transforms.alpha.BackgroundStyle import BackgroundStyle
-from lucid_torch.transforms.alpha.TFMSAddAlphaChannel import TFMSAddAlphaChannel
-from lucid_torch.transforms.alpha.TFMSMixinAlphaChannel import TFMSMixinAlphaChannel
-from lucid_torch.transforms.channels.TFMSTransformChannels import TFMSTransformChannels
-from lucid_torch.transforms.decorrelate.TFMSDecorrelate import TFMSDecorrelate
-from lucid_torch.transforms.fft.TFMSFFT import TFMSFFT
-from lucid_torch.transforms.fft.TFMSIFFT import TFMSIFFT
-from lucid_torch.transforms.monochrome.TFMSMonochromeTo import TFMSMonochromeTo
-from lucid_torch.transforms.monochrome.TFMSToMonochrome import TFMSToMonochrome
-from lucid_torch.transforms.stability.TFMSJitter import TFMSJitter
-from lucid_torch.transforms.stability.TFMSNormalize import TFMSNormalize
-from lucid_torch.transforms.stability.TFMSPad import TFMSPad
-from lucid_torch.transforms.stability.blur.TFMSRandomGaussianBlur import TFMSRandomGaussBlur
-from lucid_torch.transforms.stability.rotate.TFMSRandomRotate import TFMSRandomRotate
-from lucid_torch.transforms.stability.TFMSRandomScale import TFMSRandomScale
-from lucid_torch.transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
-from lucid_torch.transforms.unit_space.TFMSUnitToTrainingSpace import TFMSUnitToTrainingSpace
+from .alpha import BackgroundStyle, TFMSAddAlphaChannel, TFMSMixinAlphaChannel
+from .channels import TFMSTransformChannels
+from .decorrelate import TFMSDecorrelate
+from .fft import TFMSFFT, TFMSIFFT
+from .monochrome import TFMSMonochromeTo, TFMSToMonochrome
+from .stability import TFMSJitter, TFMSNormalize, TFMSPad, TFMSRandomScale
+from .stability.blur import TFMSRandomGaussianBlur
+from .stability.rotate import TFMSRandomRotate
+from .unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
+from .unit_space.TFMSUnitToTrainingSpace import TFMSUnitToTrainingSpace
 
 DEFAULT_USE_FFT = True
 DEFAULT_USE_ALPHA = False
@@ -68,11 +61,11 @@ def trainTFMS(fft: bool = DEFAULT_USE_FFT,
     transforms.append(TFMSDecorrelate())
     transforms.append(TFMSTrainingToUnitSpace())
     if alpha:
-        alpha_transforms = [TFMSRandomGaussBlur((13, 13),
-                                                (31, 31),
-                                                (5, 5),
-                                                (17, 17),
-                                                border_type='constant')]
+        alpha_transforms = [TFMSRandomGaussianBlur((13, 13),
+                                                   (31, 31),
+                                                   (5, 5),
+                                                   (17, 17),
+                                                   border_type='constant')]
         transforms.append(TFMSTransformChannels(-1,
                                                 torch.nn.Sequential(*alpha_transforms)))
         transforms.append(TFMSMixinAlphaChannel(BackgroundStyle.RAND_FFT))

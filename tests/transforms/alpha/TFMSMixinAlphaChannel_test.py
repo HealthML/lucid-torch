@@ -1,10 +1,8 @@
 import pytest
 import torch
 
-from lucid_torch.image.ImageBatch import ImageBatch
-from lucid_torch.transforms.alpha.BackgroundStyle import BackgroundStyle
-from lucid_torch.transforms.alpha.TFMSAddAlphaChannel import TFMSAddAlphaChannel
-from lucid_torch.transforms.alpha.TFMSMixinAlphaChannel import TFMSMixinAlphaChannel
+from lucid_torch.image import ImageBatch
+from lucid_torch.transforms.alpha import BackgroundStyle, TFMSAddAlphaChannel, TFMSMixinAlphaChannel
 
 
 class TestTFMSMixinAlphaChannel:

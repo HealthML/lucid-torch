@@ -1,4 +1,4 @@
-from lucid_torch.objectives.joint.JointObjective import JointObjective
+from .JointObjective import JointObjective
 
 
 class MultObjective(JointObjective):

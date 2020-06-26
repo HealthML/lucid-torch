@@ -1,5 +1,5 @@
 import pytest
-from lucid_torch.transforms.fft.TFMSFFT import TFMSFFT
+from lucid_torch.transforms.fft import TFMSFFT
 
 
 class TestTFMSFFT:

@@ -1,7 +1,6 @@
-
 import torch
 
-from lucid_torch.transforms.fft.scale import fft_scale
+from .scale import fft_scale
 
 
 class TFMSFFT(torch.nn.Module):

@@ -2,12 +2,12 @@ from random import randint
 
 from torch import nn
 
-from lucid_torch.transforms.stability.blur.TFMSGaussianBlur import TFMSGaussianBlur
+from lucid_torch.transforms.stability.blur import TFMSGaussianBlur
 
 
-class TFMSRandomGaussBlur(nn.Module):
+class TFMSRandomGaussianBlur(nn.Module):
     def __init__(self, min_kernel_size=(11, 11), max_kernel_size=(51, 51), min_sigma=(3, 3), max_sigma=(21, 21), border_type='reflect'):
-        super(TFMSRandomGaussBlur, self).__init__()
+        super(TFMSRandomGaussianBlur, self).__init__()
         self.min_kernel_size = min_kernel_size
         self.max_kernel_size = max_kernel_size
         self.border_type = border_type

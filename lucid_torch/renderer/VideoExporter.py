@@ -1,8 +1,8 @@
 import numpy as np
 from moviepy.video.io.ffmpeg_writer import FFMPEG_VideoWriter
 
-from lucid_torch.renderer.Observer import RendererObserver
-from lucid_torch.renderer.Renderer_internal import Renderer
+from .Observer import RendererObserver
+from .Renderer import Renderer
 
 
 class RendererVideoExporter(RendererObserver):

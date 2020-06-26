@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from lucid_torch.objectives.Objective import Objective
+from lucid_torch.objectives import Objective
 
 
 class ConvNeuronDiversityObjective(Objective):

@@ -1,4 +1,4 @@
-from lucid_torch.renderer.Renderer_internal import Renderer
+from lucid_torch.renderer.Renderer import Renderer
 from lucid_torch.renderer.Observer import RendererObserver
 
 

@@ -2,9 +2,9 @@ import pytest
 import torch
 from torchvision import models
 
-from lucid_torch.image.ImageBatch import ImageBatch
-from lucid_torch.objectives.channel.ChannelObjective import ChannelObjective
-from lucid_torch.renderer.Renderer import RendererBuilder
+from lucid_torch.image import ImageBatch
+from lucid_torch.objectives.channel import ChannelObjective
+from lucid_torch.renderer import RendererBuilder
 
 
 @pytest.fixture
