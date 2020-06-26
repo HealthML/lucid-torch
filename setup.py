@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='lucid torch',
+    name='Lucid Torch',
     version='1.0.0',
     description='Feature visualization and attribution for pytorch',
     url='https://github.com/mkirchler/feature-visualization',
@@ -10,5 +10,6 @@ setup(
     python_requires='>=3.7',
     install_requires=['torch', "numpy", "pandas", "pillow",
                       "scipy", "torchvision", "tqdm", "scikit-image",
-                      "matplotlib", "kornia==0.3.*", "moviepy"],
+                      "matplotlib", "kornia==0.3.*", "moviepy",
+                      "ipython"],
 )
