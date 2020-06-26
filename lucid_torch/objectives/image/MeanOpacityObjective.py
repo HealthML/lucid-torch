@@ -11,5 +11,5 @@ class MeanOpacityObjective(ImageObjective):
     def _compute_loss(self, imageBatch):
         self.imageBatch = imageBatch
         unmodified = self.imageBatch.unmodified()
-        opacity = unmodified.transform(self.unit_space_transforms).data[-1]
+        opacity = unmodified.transform(self.unit_space_transforms).data[:, -1]
         return opacity.mean()

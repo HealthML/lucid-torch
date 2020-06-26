@@ -22,14 +22,7 @@ def objective(device="cuda:0", numberOfFrames=500):
     # objectives can be combined
     objective = 0.5 * obj1 + obj2 - obj3
 
-    # return 4 visualizations of size 224 x 224
-    imageBatch = ImageBatch.generate(
-        width=224,
-        height=224,
-        batch_size=4,
-        channels=3,
-        data_space_transform=presets.dataspaceTFMS()
-    ).to(device)
+    imageBatch = ImageBatch.generate().to(device)
 
     optimizer = torch.optim.Adam([imageBatch.data],
                                  lr=0.05,
@@ -41,10 +34,7 @@ def objective(device="cuda:0", numberOfFrames=500):
                 .model(model)
                 .optimizer(optimizer)
                 .objective(objective)
-                .trainTFMS(presets.trainTFMS())
-                .drawTFMS(presets.drawTFMS())
                 .withLivePreview()
-                .withProgressBar()
                 .build()
                 )
     renderer.render(numberOfFrames)

@@ -25,7 +25,26 @@ cc_norm = C / max_norm_svd_sqrt
 
 def linear_decorrelate(img):
     '''multiply input by sqrt of empirical ImageNet color correlation matrix'''
-    img = img.permute(0, 2, 3, 1)
-    img = (img.reshape(-1, 3) @ cc_norm.t().to(img.device)).view(*img.shape)
-    img = img.permute(0, 3, 1, 2)
-    return img
+    if img.shape[1] == 1:
+        decorrelated = torch.stack([img] * 3, 1)
+    elif img.shape[1] == 3:
+        decorrelated = img
+    elif img.shape[1] == 4:
+        decorrelated = img[:, :-1]
+    else:
+        raise NotImplementedError()
+
+    decorrelated = decorrelated.permute(0, 2, 3, 1)
+    decorrelated = (decorrelated.reshape(-1, 3) @ cc_norm.t().to(img.device)).view(*decorrelated.shape)
+    decorrelated = decorrelated.permute(0, 3, 1, 2)
+
+    if img.shape[1] == 1:
+        return decorrelated[:, :1]
+    elif img.shape[1] == 3:
+        return decorrelated
+    elif img.shape[1] == 4:
+        img = img.clone()
+        img[:, :-1] = decorrelated
+        return img
+    else:
+        raise NotImplementedError()

@@ -1,4 +1,3 @@
-import warnings
 from typing import Iterable, Union
 
 import numpy as np
@@ -6,7 +5,7 @@ import PIL
 import torch
 from torchvision.transforms import ToTensor
 
-warnings.filterwarnings('ignore', category=UserWarning)
+from lucid_torch.transforms import presets
 
 
 class ImageBatch:
@@ -49,7 +48,7 @@ class ImageBatch:
         elif not isinstance(paths, Iterable):
             raise TypeError()
         if data_space_transform is None:
-            data_space_transform = torch.nn.Identity()
+            data_space_transform = presets.dataspaceTFMS()
         elif not isinstance(data_space_transform, torch.nn.Module):
             raise TypeError()
 
@@ -64,7 +63,7 @@ class ImageBatch:
     def generate(
             width: int = 224,
             height: int = 224,
-            batch_size: int = 3,
+            batch_size: int = 4,
             channels: int = 3,
             std: float = 0.01,
             data_space_transform: Union[torch.nn.Module, None] = None):
@@ -84,7 +83,7 @@ class ImageBatch:
         assertIsPositiveInt(channels)
         assertIsFloat(std)
         if data_space_transform is None:
-            data_space_transform = torch.nn.Identity()
+            data_space_transform = presets.dataspaceTFMS()
         elif not isinstance(data_space_transform, torch.nn.Module):
             raise TypeError()
 

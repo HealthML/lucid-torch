@@ -9,7 +9,7 @@ from lucid_torch.renderer import RendererBuilder
 
 @pytest.fixture
 def imageBatch():
-    return ImageBatch.generate()
+    return ImageBatch.generate(data_space_transform=torch.nn.Identity())
 
 
 @pytest.fixture

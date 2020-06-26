@@ -1,8 +1,8 @@
 import numpy as np
+import PIL
 import pytest
 import torch
 import torchvision
-import PIL
 
 from lucid_torch.image import ImageBatch
 
@@ -62,7 +62,7 @@ class TestImageBatch:
                 EXAMPLE_IMAGE_PATH, data_space_transform="not a transform")
 
     def test_load_loads_image(self, example_image):
-        imageBatch = ImageBatch.load(EXAMPLE_IMAGE_PATH)
+        imageBatch = ImageBatch.load(EXAMPLE_IMAGE_PATH, data_space_transform=torch.nn.Identity())
         assert torch.all((example_image == imageBatch.data[0]))
 
     def test_load_applies_transforms(self):
@@ -108,7 +108,7 @@ class TestImageBatch:
 
     def test_generate_creates_correct_shape(self):
         assert ImageBatch.generate(
-            width=24, height=33, batch_size=2, channels=1).data.shape == (2, 1, 33, 24)
+            width=24, height=33, batch_size=2, channels=1, data_space_transform=torch.nn.Identity()).data.shape == (2, 1, 33, 24)
         # endregion
 
     # region unmodified

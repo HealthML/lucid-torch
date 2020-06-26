@@ -1,10 +1,8 @@
-import torch
 from torchvision import models
 
 from lucid_torch.image import ImageBatch
 from lucid_torch.objectives.channel import ChannelObjective
 from lucid_torch.renderer import RendererBuilder
-from lucid_torch.transforms import presets
 
 
 def basic(device="cuda:0", numberOfFrames=500):
@@ -18,24 +16,14 @@ def basic(device="cuda:0", numberOfFrames=500):
         width=224,
         height=224,
         batch_size=4,
-        channels=3,
-        data_space_transform=presets.dataspaceTFMS()
+        channels=3
     ).to(device)
-
-    optimizer = torch.optim.Adam([imageBatch.data],
-                                 lr=0.05,
-                                 eps=1e-7,
-                                 weight_decay=0.0)
 
     renderer = (RendererBuilder()
                 .imageBatch(imageBatch)
                 .model(model)
-                .optimizer(optimizer)
                 .objective(objective)
-                .trainTFMS(presets.trainTFMS())
-                .drawTFMS(presets.drawTFMS())
                 .withLivePreview()
-                .withProgressBar()
                 .build()
                 )
     renderer.render(numberOfFrames)

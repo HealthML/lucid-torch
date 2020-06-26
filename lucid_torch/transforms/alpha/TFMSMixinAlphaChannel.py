@@ -14,7 +14,7 @@ class TFMSMixinAlphaChannel(torch.nn.Module):
 
     def forward(self, data: torch.Tensor):
         img = data[:, :-1]
-        alpha = data[:, -1]
+        alpha = data[:, -1:]
         if self.background is BackgroundStyle.BLACK:
             background = torch.zeros_like(img)
         elif self.background is BackgroundStyle.WHITE:
