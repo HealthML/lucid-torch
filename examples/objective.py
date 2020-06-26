@@ -9,7 +9,7 @@ from objectives.neuron.FCNeuronObjective import FCNeuronObjective
 from tfms import presets
 
 
-def objective(device="cuda:0", numberOfFrames=1):
+def objective(device="cuda:0", numberOfFrames=500):
     model = models.resnet18(pretrained=True)
 
     # visualize full channel

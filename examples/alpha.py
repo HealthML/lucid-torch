@@ -10,7 +10,7 @@ from tfms.unit_space import TFMSTrainingToUnitSpace
 from tfms.fft import TFMSIFFT
 
 
-def alpha(device="cuda:0", numberOfFrames=1):
+def alpha(device="cuda:0", numberOfFrames=500):
     model = models.resnet18(pretrained=True)
 
     fcneuron = FCNeuronObjective(lambda m: m.fc, neuron=234)
