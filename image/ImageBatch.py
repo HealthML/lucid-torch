@@ -37,7 +37,7 @@ class ImageBatch:
             self.data = torch.tensor(
                 data, requires_grad=True, dtype=torch.float)
         elif isinstance(data, torch.Tensor):
-            self.data = data
+            self.data = data.to(dtype=torch.float).requires_grad_()
         else:
             raise TypeError()
 
@@ -102,8 +102,7 @@ class ImageBatch:
         return ModifiedImageBatch(transforms(self.data), self)
 
     def to(self, device):
-        self.data = torch.tensor(
-            self.data, device=device, requires_grad=True, dtype=torch.float)
+        self.data = self.data.detach().to(device).requires_grad_()
         return self
 
 
