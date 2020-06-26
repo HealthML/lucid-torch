@@ -2,8 +2,8 @@ import pytest
 import torch
 
 from image.ImageBatch import ImageBatch
-from tfms.alpha import (BackgroundStyle, TFMSAddAlphaChannel,
-                        TFMSMixinAlphaChannel)
+from transforms.alpha import (BackgroundStyle, TFMSAddAlphaChannel,
+                              TFMSMixinAlphaChannel)
 
 
 class TestTFMSAddAlphaChannel:

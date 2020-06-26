@@ -6,7 +6,7 @@ from renderer.Renderer import RendererBuilder
 from objectives.channel.ChannelObjective import ChannelObjective
 from objectives.neuron.ConvNeuronObjective import ConvNeuronObjective
 from objectives.neuron.FCNeuronObjective import FCNeuronObjective
-from tfms import presets
+from transforms import presets
 
 
 def objective(device="cuda:0", numberOfFrames=500):

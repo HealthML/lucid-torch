@@ -1,7 +1,7 @@
 import torch
 
 from image.ImageBatch import ImageBatch
-from tfms.unit_space import TFMSTrainingToUnitSpace, TFMSUnitToTrainingSpace
+from transforms.unit_space import TFMSTrainingToUnitSpace, TFMSUnitToTrainingSpace
 
 
 class TestTFMSTrainingToUnitSpace:

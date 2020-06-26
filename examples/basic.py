@@ -4,7 +4,7 @@ import torch
 from image.ImageBatch import ImageBatch
 from renderer.Renderer import RendererBuilder
 from objectives.channel.ChannelObjective import ChannelObjective
-from tfms import presets
+from transforms import presets
 
 
 def basic(device="cuda:0", numberOfFrames=500):

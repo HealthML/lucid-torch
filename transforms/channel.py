@@ -4,7 +4,7 @@ import torch
 
 
 class TFMSTransformChannels(torch.nn.Module):
-    def __init__(self, channels: Union[int, List, torch.Tensor], tfms: torch.nn.Module):
+    def __init__(self, channels: Union[int, List, torch.Tensor], transforms: torch.nn.Module):
         super(TFMSTransformChannels, self).__init__()
         if isinstance(channels, (list, int)):
             if isinstance(channels, int):
@@ -12,14 +12,14 @@ class TFMSTransformChannels(torch.nn.Module):
             channels = torch.Tensor(channels)
         elif not isinstance(channels, torch.Tensor):
             raise TypeError()
-        if not isinstance(tfms, torch.nn.Module):
+        if not isinstance(transforms, torch.nn.Module):
             raise TypeError()
         self.channels = channels.long()
-        self.tfms = tfms
+        self.transforms = transforms
 
     def forward(self, data: torch.Tensor):
         self.channels = self.channels.to(data.device)
-        transformed = self.tfms(data[:, self.channels])
+        transformed = self.transforms(data[:, self.channels])
         data = data.clone()
         data[:, self.channels] = transformed
         return data

@@ -2,7 +2,7 @@ from typing import Union
 
 import torch
 
-import tfms.presets as presets
+import transforms.presets as presets
 from image.ImageBatch import ImageBatch
 from objectives.Objective import Objective
 from renderer.LivePreview import RendererLivePreview
@@ -49,16 +49,16 @@ class RendererBuilder:
         self.__objective = objective
         return self
 
-    def trainTFMS(self, tfms: torch.nn.Module):
-        if not isinstance(tfms, torch.nn.Module):
+    def trainTFMS(self, transforms: torch.nn.Module):
+        if not isinstance(transforms, torch.nn.Module):
             raise TypeError()
-        self.__trainTFMS = tfms
+        self.__trainTFMS = transforms
         return self
 
-    def drawTFMS(self, tfms: torch.nn.Module):
-        if not isinstance(tfms, torch.nn.Module):
+    def drawTFMS(self, transforms: torch.nn.Module):
+        if not isinstance(transforms, torch.nn.Module):
             raise TypeError()
-        self.__drawTFMS = tfms
+        self.__drawTFMS = transforms
         return self
 
     def exportVideo(self, filename: Union[None, str], fps=60):

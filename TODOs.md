@@ -67,7 +67,7 @@ find image patches that most highly activate channels instead of optimize! --> e
 
 ## General
 
-### check tfms
+### check transforms
 
 include proper transformations for visualizations --> they should match what we trained with, not weird resizes
 -> check everywhere, e.g. in initializer as well

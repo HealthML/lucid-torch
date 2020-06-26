@@ -1,5 +1,5 @@
 from image.ImageBatch import ImageBatch
-from tfms.channel import TFMSTransformChannels
+from transforms.channel import TFMSTransformChannels
 import pytest
 import torch
 
@@ -23,8 +23,8 @@ class Test_TFMSTransformChannels:
     # region forward
     def test_forward_changes_multiple_selected_channels(self):
         imageBatch = ImageBatch.generate()
-        tfms = TFMSTransformChannels([0, 2], TFMSPlusTwo())
-        transformed_imageBatch = imageBatch.transform(tfms)
+        transforms = TFMSTransformChannels([0, 2], TFMSPlusTwo())
+        transformed_imageBatch = imageBatch.transform(transforms)
         expected_d0: torch.Tensor = imageBatch.data[:, 0] + 2
         real_d0: torch.Tensor = transformed_imageBatch.data[:, 0]
         assert expected_d0.equal(real_d0)

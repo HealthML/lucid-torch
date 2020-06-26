@@ -1,5 +1,5 @@
 import pytest
-from tfms.monochrome import TFMSToMonochrome, TFMSMonochromeTo
+from transforms.monochrome import TFMSToMonochrome, TFMSMonochromeTo
 from image.ImageBatch import ImageBatch
 
 
