@@ -44,6 +44,8 @@ def drawTFMS(fft: bool = DEFAULT_USE_FFT,
         tfms.append(TFMSMixinAlphaChannel(BackgroundStyle.BLACK))
         # TODO_M Das Bild hat einen fast gleichmäßigen Alpha Kanal?
         # Wenn wir hier RAND_FFT nutzen, geht es erstaunlicherweise einigermaßen gut
+        # Problem könnte daran liegen, dass alpha mit in fft space ist
+        # (kann nicht so leicht geändert werden, da fft space die dimensionen verändert)
     if monochrome:
         tfms.append(TFMSMonochromeTo())
     return torch.nn.Sequential(*tfms)
@@ -52,7 +54,7 @@ def drawTFMS(fft: bool = DEFAULT_USE_FFT,
 def trainTFMS(fft: bool = DEFAULT_USE_FFT,
               alpha: bool = DEFAULT_USE_ALPHA,
               monochrome: bool = DEFAULT_USE_MONOCHROME,
-              normalize: bool = False):
+              normalize: bool = True):
     tfms = []
     if fft:
         tfms.append(TFMSIFFT())
