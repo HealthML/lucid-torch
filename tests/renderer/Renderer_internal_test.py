@@ -1,5 +1,5 @@
-from renderer.Renderer_internal import Renderer
-from renderer.Observer import RendererObserver
+from lucid_torch.renderer.Renderer_internal import Renderer
+from lucid_torch.renderer.Observer import RendererObserver
 
 
 # region fakes

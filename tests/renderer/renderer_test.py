@@ -1,9 +1,9 @@
 import pytest
 
-from renderer.LivePreview import RendererLivePreview
-from renderer.ProgressBar import RendererProgressBar
-from renderer.Renderer import RendererBuilder
-from renderer.VideoExporter import RendererVideoExporter
+from lucid_torch.renderer.LivePreview import RendererLivePreview
+from lucid_torch.renderer.ProgressBar import RendererProgressBar
+from lucid_torch.renderer.Renderer import RendererBuilder
+from lucid_torch.renderer.VideoExporter import RendererVideoExporter
 
 
 class TestRendererBuilder:

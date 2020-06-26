@@ -1,8 +1,8 @@
 import torch
 
-from image.ImageBatch import ImageBatch
-from transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
-from transforms.unit_space.TFMSUnitToTrainingSpace import TFMSUnitToTrainingSpace
+from lucid_torch.image.ImageBatch import ImageBatch
+from lucid_torch.transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
+from lucid_torch.transforms.unit_space.TFMSUnitToTrainingSpace import TFMSUnitToTrainingSpace
 
 
 def test_unit_space_transforms_invert_each_other():

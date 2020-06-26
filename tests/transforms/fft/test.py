@@ -1,8 +1,8 @@
 import torch
 
-from image.ImageBatch import ImageBatch
-from transforms.fft.TFMSFFT import TFMSFFT
-from transforms.fft.TFMSIFFT import TFMSIFFT
+from lucid_torch.image.ImageBatch import ImageBatch
+from lucid_torch.transforms.fft.TFMSFFT import TFMSFFT
+from lucid_torch.transforms.fft.TFMSIFFT import TFMSIFFT
 
 
 def test_fft_transforms_invert_each_other():

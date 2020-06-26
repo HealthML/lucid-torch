@@ -1,6 +1,6 @@
 import pytest
 
-from renderer.VideoExporter import RendererVideoExporter
+from lucid_torch.renderer.VideoExporter import RendererVideoExporter
 
 
 class TestVideoExporter:

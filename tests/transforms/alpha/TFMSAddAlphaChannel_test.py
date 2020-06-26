@@ -1,7 +1,7 @@
 import pytest
 
-from image.ImageBatch import ImageBatch
-from transforms.alpha.TFMSAddAlphaChannel import TFMSAddAlphaChannel
+from lucid_torch.image.ImageBatch import ImageBatch
+from lucid_torch.transforms.alpha.TFMSAddAlphaChannel import TFMSAddAlphaChannel
 
 
 class TestTFMSAddAlphaChannel:

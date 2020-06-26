@@ -1,4 +1,4 @@
-from renderer.ProgressBar import RendererProgressBar
+from lucid_torch.renderer.ProgressBar import RendererProgressBar
 
 
 class TestProgressBar:

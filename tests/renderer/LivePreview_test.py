@@ -1,6 +1,6 @@
 import pytest
 
-from renderer.LivePreview import RendererLivePreview
+from lucid_torch.renderer.LivePreview import RendererLivePreview
 
 
 class TestLivePreview:

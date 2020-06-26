@@ -1,5 +1,5 @@
-from image.ImageBatch import ImageBatch
-from transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
+from lucid_torch.image.ImageBatch import ImageBatch
+from lucid_torch.transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
 
 
 class TestTFMSTrainingToUnitSpace:

@@ -1,8 +1,8 @@
 import torch
 
-from examples.alpha import alpha
-from examples.basic import basic
-from examples.objective import objective
+from lucid_torch.examples.alpha import alpha
+from lucid_torch.examples.basic import basic
+from lucid_torch.examples.objective import objective
 
 
 def test_alphaReturnsTensor():
