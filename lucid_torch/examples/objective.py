@@ -6,7 +6,6 @@ from lucid_torch.objectives.channel import ChannelObjective
 from lucid_torch.objectives.neuron import (ConvNeuronObjective,
                                            FCNeuronObjective)
 from lucid_torch.renderer import RendererBuilder
-from lucid_torch.transforms import presets
 
 
 def objective(device="cuda:0", numberOfFrames=500):
