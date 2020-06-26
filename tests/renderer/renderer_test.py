@@ -1,8 +1,5 @@
 import pytest
-import torch
 
-from image.ImageBatch import ImageBatch
-from objectives import ConstObjective
 from renderer.LivePreview import RendererLivePreview
 from renderer.ProgressBar import RendererProgressBar
 from renderer.Renderer import RendererBuilder
