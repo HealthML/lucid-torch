@@ -1,15 +1,22 @@
 import torch
 
-from transforms.alpha import (BackgroundStyle, TFMSAddAlphaChannel,
-                              TFMSMixinAlphaChannel)
-from transforms.channel import TFMSTransformChannels
-from transforms.decorrelate import TFMSDecorrelate
-from transforms.fft import TFMSFFT, TFMSIFFT
-from transforms.monochrome import TFMSMonochromeTo, TFMSToMonochrome
-from transforms.stability import (TFMSJitter, TFMSNormalize, TFMSPad,
-                                  TFMSRandomGaussBlur, TFMSRandomRotate,
-                                  TFMSRandomScale)
-from transforms.unit_space import TFMSTrainingToUnitSpace, TFMSUnitToTrainingSpace
+from transforms.alpha.BackgroundStyle import BackgroundStyle
+from transforms.alpha.TFMSAddAlphaChannel import TFMSAddAlphaChannel
+from transforms.alpha.TFMSMixinAlphaChannel import TFMSMixinAlphaChannel
+from transforms.channels.TFMSTransformChannels import TFMSTransformChannels
+from transforms.decorrelate.TFMSDecorrelate import TFMSDecorrelate
+from transforms.fft.TFMSFFT import TFMSFFT
+from transforms.fft.TFMSIFFT import TFMSIFFT
+from transforms.monochrome.TFMSMonochromeTo import TFMSMonochromeTo
+from transforms.monochrome.TFMSToMonochrome import TFMSToMonochrome
+from transforms.stability.TFMSJitter import TFMSJitter
+from transforms.stability.TFMSNormalize import TFMSNormalize
+from transforms.stability.TFMSPad import TFMSPad
+from transforms.stability.blur.TFMSRandomGaussianBlur import TFMSRandomGaussBlur
+from transforms.stability.rotate.TFMSRandomRotate import TFMSRandomRotate
+from transforms.stability.TFMSRandomScale import TFMSRandomScale
+from transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
+from transforms.unit_space.TFMSUnitToTrainingSpace import TFMSUnitToTrainingSpace
 
 DEFAULT_USE_FFT = True
 DEFAULT_USE_ALPHA = False

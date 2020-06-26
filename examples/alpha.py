@@ -6,8 +6,8 @@ from renderer.Renderer import RendererBuilder
 from objectives.image.MeanOpacityObjective import MeanOpacityObjective
 from objectives.neuron.FCNeuronObjective import FCNeuronObjective
 from transforms import presets
-from transforms.unit_space import TFMSTrainingToUnitSpace
-from transforms.fft import TFMSIFFT
+from transforms.unit_space.TFMSTrainingToUnitSpace import TFMSTrainingToUnitSpace
+from transforms.fft.TFMSIFFT import TFMSIFFT
 
 
 def alpha(device="cuda:0", numberOfFrames=500):

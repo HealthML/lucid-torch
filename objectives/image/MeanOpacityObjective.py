@@ -12,4 +12,4 @@ class MeanOpacityObjective(ImageObjective):
         self.imageBatch = imageBatch
         unmodified = self.imageBatch.unmodified()
         opacity = unmodified.transform(self.unit_space_transforms).data[-1]
-        return opacity.sigmoid().mean()
+        return opacity.mean()

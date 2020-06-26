@@ -1,22 +1,7 @@
 import pytest
-from transforms.monochrome import TFMSToMonochrome, TFMSMonochromeTo
+
 from image.ImageBatch import ImageBatch
-
-
-class TestTFMSToMonochrome:
-    # region __init__
-    def test_init_raises_error_on_invalid_parameter(self):
-        with pytest.raises(TypeError):
-            TFMSToMonochrome('not a list')
-    # endregion
-
-    # region forward
-    def test_forward_creates_one_dimension(self):
-        imageBatch = ImageBatch.generate(
-            channels=3,
-            data_space_transform=TFMSToMonochrome([0.3, 0.3, 0.4]))
-        assert imageBatch.data.shape[1] == 1
-    # endregion
+from transforms.monochrome.TFMSMonochromeTo import TFMSMonochromeTo
 
 
 class TestTFMSMonochromeTo:

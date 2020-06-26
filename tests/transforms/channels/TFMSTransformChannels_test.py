@@ -1,5 +1,5 @@
 from image.ImageBatch import ImageBatch
-from transforms.channel import TFMSTransformChannels
+from transforms.channels.TFMSTransformChannels import TFMSTransformChannels
 import pytest
 import torch
 
