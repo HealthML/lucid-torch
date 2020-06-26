@@ -3,8 +3,9 @@ import torch
 
 from image.ImageBatch import ImageBatch
 from renderer.Renderer import RendererBuilder
-from renderer.Renderer_internal import Renderer
-from objectives import Channel, ConvNeuron, FCNeuron
+from objectives.channel.ChannelObjective import ChannelObjective
+from objectives.neuron.ConvNeuronObjective import ConvNeuronObjective
+from objectives.neuron.FCNeuronObjective import FCNeuronObjective
 from tfms import presets
 
 
@@ -12,11 +13,11 @@ def objective(device="cuda:0"):
     model = models.resnet18(pretrained=True)
 
     # visualize full channel
-    obj1 = Channel(lambda m: m.layer3[1].conv2, channel=15)
+    obj1 = ChannelObjective(lambda m: m.layer3[1].conv2, channel=15)
     # visualize single (center) neuron in this channel
-    obj2 = ConvNeuron(lambda m: m.layer3[1].conv2, channel=15)
+    obj2 = ConvNeuronObjective(lambda m: m.layer3[1].conv2, channel=15)
     # visualize neuron in fully connected layer, in this case already output
-    obj3 = FCNeuron(lambda m: m.fc, neuron=123)
+    obj3 = FCNeuronObjective(lambda m: m.fc, neuron=123)
 
     # objectives can be combined
     objective = 0.5 * obj1 + obj2 - obj3
@@ -35,16 +36,16 @@ def objective(device="cuda:0"):
                                  eps=1e-7,
                                  weight_decay=0.0)
 
-    renderer: Renderer = (RendererBuilder()
-                          .imageBatch(imageBatch)
-                          .model(model)
-                          .optimizer(optimizer)
-                          .objective(objective)
-                          .trainTFMS(presets.trainTFMS())
-                          .drawTFMS(presets.drawTFMS())
-                          .withLivePreview()
-                          .withProgressBar()
-                          .build()
-                          )
+    renderer = (RendererBuilder()
+                .imageBatch(imageBatch)
+                .model(model)
+                .optimizer(optimizer)
+                .objective(objective)
+                .trainTFMS(presets.trainTFMS())
+                .drawTFMS(presets.drawTFMS())
+                .withLivePreview()
+                .withProgressBar()
+                .build()
+                )
     renderer.render(1000)
     return renderer.drawableImageBatch().data

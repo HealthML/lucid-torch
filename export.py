@@ -11,7 +11,8 @@ from tqdm import tqdm
 
 from attribution import channel_attr_binary, prepare_layer_cams
 from base import render
-from objectives import Channel, FCNeuron
+from objectives.channel.ChannelObjective import ChannelObjective
+from objectives.neuron.FCNeuronObjective import FCNeuronObjective
 from utils import build_spritemap, compute_layer, namify
 
 
@@ -139,7 +140,7 @@ def prep_v2(model, n_epochs, paths, all_paths, size=(448, 448), dev='cuda:0'):
     # TODO rename
     def final_layer_func(m):
         return m
-    obj = FCNeuron(final_layer_func, neuron=0)
+    obj = FCNeuronObjective(final_layer_func, neuron=0)
     n_images = len(paths)
 
     # basic fv
@@ -267,7 +268,7 @@ def prepare_layer(model, layer_func, n_epochs=250, size=(1, 3, 224, 224), dev='c
 
     channel_imgs = []
     for c in tqdm(range(ch)):
-        obj = Channel(layer_func, channel=c)
+        obj = ChannelObjective(layer_func, channel=c)
         channel_img = render(
             model,
             obj,

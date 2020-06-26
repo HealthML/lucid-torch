@@ -3,7 +3,7 @@ import torch
 from torchvision import models
 
 from image.ImageBatch import ImageBatch
-from objectives import Channel
+from objectives.channel.ChannelObjective import ChannelObjective
 from renderer.Renderer import RendererBuilder
 
 
@@ -27,7 +27,7 @@ def optimizer(imageBatch):
 
 @pytest.fixture
 def objective():
-    return Channel(lambda m: m.layer3[1].conv2, channel=15)
+    return ChannelObjective(lambda m: m.layer3[1].conv2, channel=15)
 
 
 @pytest.fixture

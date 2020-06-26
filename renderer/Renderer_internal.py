@@ -1,7 +1,7 @@
 import torch
 
 from image.ImageBatch import ImageBatch
-from objectives import Objective
+from objectives.Objective import Objective
 from renderer.Observer import RendererObserver
 from utils import prep_model
 

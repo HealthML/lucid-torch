@@ -3,7 +3,7 @@ from typing import Union
 import torch
 
 from image.ImageBatch import ImageBatch
-from objectives import Objective
+from objectives.Objective import Objective
 from renderer.LivePreview import RendererLivePreview
 from renderer.ProgressBar import RendererProgressBar
 from renderer.Renderer_internal import Renderer

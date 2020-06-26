@@ -3,8 +3,8 @@ import torch
 
 from image.ImageBatch import ImageBatch
 from renderer.Renderer import RendererBuilder
-from renderer.Renderer_internal import Renderer
-from objectives import MeanOpacity, FCNeuron
+from objectives.image.MeanOpacityObjective import MeanOpacityObjective
+from objectives.neuron import FCNeuronObjective
 from tfms import presets
 from tfms.unit_space import TFMSTrainingToUnitSpace
 from tfms.fft import TFMSIFFT
@@ -13,8 +13,8 @@ from tfms.fft import TFMSIFFT
 def alpha(device="cuda:0"):
     model = models.resnet18(pretrained=True)
 
-    fcneuron = FCNeuron(lambda m: m.fc, neuron=234)
-    alpha = MeanOpacity(torch.nn.Sequential(
+    fcneuron = FCNeuronObjective(lambda m: m.fc, neuron=234)
+    alpha = MeanOpacityObjective(torch.nn.Sequential(
         TFMSIFFT(),
         TFMSTrainingToUnitSpace()
     ))
@@ -29,16 +29,16 @@ def alpha(device="cuda:0"):
                                  eps=1e-7,
                                  weight_decay=0.0)
 
-    renderer: Renderer = (RendererBuilder()
-                          .imageBatch(imageBatch)
-                          .model(model)
-                          .optimizer(optimizer)
-                          .objective(objective)
-                          .trainTFMS(presets.trainTFMS(alpha=True))
-                          .drawTFMS(presets.drawTFMS(alpha=True))
-                          .withLivePreview()
-                          .withProgressBar()
-                          .build()
-                          )
+    renderer = (RendererBuilder()
+                .imageBatch(imageBatch)
+                .model(model)
+                .optimizer(optimizer)
+                .objective(objective)
+                .trainTFMS(presets.trainTFMS(alpha=True))
+                .drawTFMS(presets.drawTFMS(alpha=True))
+                .withLivePreview()
+                .withProgressBar()
+                .build()
+                )
     renderer.render(1000)
     return renderer.drawableImageBatch().data
