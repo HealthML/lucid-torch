@@ -1,0 +1,5 @@
+[flake8]
+ignore = E508,E501
+exclude = .github,__pycache__,.pytest_cache,_ignore*,export.py
+max-complexity = 10
+max-line-length=127

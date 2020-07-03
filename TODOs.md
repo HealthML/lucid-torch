@@ -67,7 +67,7 @@ find image patches that most highly activate channels instead of optimize! --> e
 
 ## General
 
-### check tfms
+### check transforms
 
 include proper transformations for visualizations --> they should match what we trained with, not weird resizes
 -> check everywhere, e.g. in initializer as well
@@ -98,11 +98,11 @@ alpha channel! (start - `alpha_stuff.py`
 ### diversity
 
 --> check whether current impl is correct -> looks different than in tf and doesn't work well at all?
---> this for `ChannelDiversity`, `ConvNeuronDiversity` and `FCDiversity`, and potentially then also for others
+--> this for `ChannelDiversityObjective`, `ConvNeuronDiversityObjective` and `FCDiversityObjective`, and potentially then also for others
 
 ### lots of other stuff.
 
-e.g. - check whether DirectionChannel works well - more objectives - multiply two objectives - differential feature parametrizations, ...
+e.g. - check whether DirectionChannelObjective works well - more objectives - multiply two objectives - differential feature parametrizations, ...
 
 ## ATTRIBUTION
 
