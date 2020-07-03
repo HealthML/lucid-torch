@@ -7,10 +7,10 @@ from .layer import LayerObjective
 from .neuron import ConvNeuronObjective, FCNeuronObjective
 
 __all__ = [
-        "ConstObjective", "Objective",
-        "ChannelObjective", "DirectionChannelObjective",
-        "ChannelDiversityObjective", "ConvNeuronDiversityObjective", "FCDiversityObjective",
-        "ImageObjective", "MeanOpacityObjective", "TVRegularizerObjective",
-        "LayerObjective",
-        "ConvNeuronObjective", "FCNeuronObjective",
-        ]
+    "ConstObjective", "Objective",
+    "ChannelObjective", "DirectionChannelObjective",
+    "ChannelDiversityObjective", "ConvNeuronDiversityObjective", "FCDiversityObjective",
+    "ImageObjective", "MeanOpacityObjective", "TVRegularizerObjective",
+    "LayerObjective",
+    "ConvNeuronObjective", "FCNeuronObjective",
+]

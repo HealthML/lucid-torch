@@ -3,8 +3,8 @@ from torchvision import models
 
 from lucid_torch.image import ImageBatch
 from lucid_torch.objectives import (MeanOpacityObjective,
-                                          TVRegularizerObjective,
-                                          FCNeuronObjective)
+                                    TVRegularizerObjective,
+                                    FCNeuronObjective)
 from lucid_torch.renderer import RendererBuilder
 from lucid_torch.transforms import presets
 from lucid_torch.transforms.fft import TFMSIFFT

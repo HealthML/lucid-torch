@@ -16,7 +16,7 @@ class TVRegularizerObjective(ImageObjective):
         imgs = imageBatch.unmodified().transform(self.unit_space_transforms).data
         tv_x = (imgs[..., :-1, :] - imgs[..., 1:, :]).abs().sum()
         tv_y = (imgs[..., :-1] - imgs[..., 1:]).abs().sum()
-        loss = self.alpha * (tv_x + tv_y)
+        loss = self.alpha * (tv_x + tv_y) / imgs.numel() / 2.0
         self._update()
         return loss
 
