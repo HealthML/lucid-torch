@@ -8,8 +8,8 @@ setup(
     author='Hasso Plattner Institute Chair of Digital Health - Machine Learning',
     packages=find_packages(),
     python_requires='>=3.7',
-    install_requires=['torch', "numpy", "pandas", "pillow",
+    install_requires=['torch>=1.5', "numpy", "pandas", "pillow",
                       "scipy", "torchvision", "tqdm", "scikit-image",
                       "matplotlib", "kornia==0.3.*", "moviepy",
-                      "ipython"],
+                      "ipython", "pytest"],
 )
