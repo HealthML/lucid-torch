@@ -1,7 +1,7 @@
 from torchvision import models
 
 from lucid_torch.image import ImageBatch
-from lucid_torch.objectives.channel import ChannelObjective
+from lucid_torch.objectives import ChannelObjective
 from lucid_torch.renderer import RendererBuilder
 
 
