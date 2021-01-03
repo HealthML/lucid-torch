@@ -9,7 +9,7 @@ def basic(device="cuda:0", numberOfFrames=500):
     model = models.resnet18(pretrained=True)
 
     # look into 3rd layer, 10th channel; this changes a lot between architectures
-    objective = ChannelObjective(lambda m: m.layer3[1].conv2, channel=15)
+    objective = ChannelObjective(lambda m: m.layer3[1].conv2, channel=18)
 
     # return 4 visualizations of size 224 x 224
     imageBatch = ImageBatch.generate(

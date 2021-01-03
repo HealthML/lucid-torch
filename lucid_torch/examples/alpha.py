@@ -2,7 +2,7 @@ import torch
 from torchvision import models
 
 from ..image import ImageBatch
-from ..objectives import (FCNeuronObjective, MeanOpacityObjective,
+from ..objectives import (ChannelObjective, MeanOpacityObjective,
                           TVRegularizerObjective)
 from ..renderer import RendererBuilder
 from ..transforms import presets
@@ -14,7 +14,7 @@ from ..transforms.unit_space.TFMSTrainingToUnitSpace import \
 def alpha(device="cuda:0", numberOfFrames=500):
     model = models.resnet18(pretrained=True)
 
-    fcneuron = FCNeuronObjective(lambda m: m.fc, neuron=234)
+    base_objective = ChannelObjective(lambda m: m.layer3[1].conv2, channel=15)
     alpha = MeanOpacityObjective(torch.nn.Sequential(
         TFMSIFFT(),
         TFMSTrainingToUnitSpace()
@@ -23,7 +23,7 @@ def alpha(device="cuda:0", numberOfFrames=500):
         TFMSIFFT(),
         TFMSTrainingToUnitSpace()
     ))
-    objective = fcneuron * (1.0 - alpha) * (1.0 - lowfreq)
+    objective = base_objective * (1.0 - alpha) * (1.0 - lowfreq)
 
     imageBatch = ImageBatch.generate(
         data_space_transform=presets.dataspaceTFMS(alpha=True)

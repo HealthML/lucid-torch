@@ -1,5 +1,5 @@
 from .alpha import alpha
 from .basic import basic
-from .objective import objective
+from .multiple_objectives import multiple_objectives
 
-__all__ = ["alpha", "basic", "objective"]
+__all__ = ["alpha", "basic", "multiple_objectives"]

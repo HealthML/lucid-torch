@@ -10,21 +10,13 @@
 
 ## Usage
 
-Lucid Torch modules can be imported via `import lucid_torch.<module name>`. You can find usage examples here:
+You can find usage samples here:
 
 - [Basic](lucid_torch/examples/basic.py)
-- [Multiple Objectives](lucid_torch/examples/objective.py)
+- [Multiple Objectives](lucid_torch/examples/multiple_objectives.py)
 - [Alpha Objective](lucid_torch/examples/alpha.py)
 
-You can import and run the examples via
-
-```python
-from lucid_torch.examples import alpha, basic, objective
-
-trained_alpha_image = alpha()
-trained_basic_image = basic(device='cpu')
-trained_objective_image = objective(numberOfFrames=500)
-```
+In [this](examples.ipynb) IPython notebook we have executed the examples.
 
 ## Running the Tests
 

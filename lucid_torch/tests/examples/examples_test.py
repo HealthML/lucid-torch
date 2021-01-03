@@ -1,6 +1,6 @@
 import torch
 
-from ...examples import alpha, basic, objective
+from ...examples import alpha, basic, multiple_objectives
 
 
 def test_alphaReturnsTensor():
@@ -12,4 +12,4 @@ def test_basicReturnsTensor():
 
 
 def test_objectiveReturnsTensor():
-    assert isinstance(objective('cpu', 1), torch.Tensor)
+    assert isinstance(multiple_objectives('cpu', 1), torch.Tensor)
