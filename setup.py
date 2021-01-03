@@ -8,7 +8,7 @@ setup(
     author='Hasso Plattner Institute Chair of Digital Health - Machine Learning',
     packages=find_packages(),
     python_requires='==3.8.*',
-    install_requires=['torch==1.5.1',
+    install_requires=['torch==1.5.0',
                       "numpy==1.18.1",
                       "pandas==1.0.1",
                       "pillow==7.0.0",
