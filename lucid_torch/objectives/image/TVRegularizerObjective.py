@@ -20,7 +20,6 @@ class TVRegularizerObjective(ImageObjective):
         self._update()
         return loss
 
-    # TODO more elegant!
     def _update(self):
         self.step += 1
         if self.update_thres and (self.step in self.update_thres):

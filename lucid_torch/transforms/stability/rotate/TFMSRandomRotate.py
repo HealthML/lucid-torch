@@ -3,9 +3,6 @@ import torch
 
 from .TFMSRotate import TFMSRotate
 
-# Kornia has a random rotate class but unfortinately its padding mode is set to 'zeros' and cannot be changed
-# TODO: Feature request in Kornia
-
 
 class TFMSRandomRotate(torch.nn.Module):
     def __init__(self, angles=None, rng=None):

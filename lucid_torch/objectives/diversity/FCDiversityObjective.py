@@ -4,7 +4,6 @@ from ..Objective import Objective
 
 
 class FCDiversityObjective(Objective):
-    # TODO different gram aggregation (e.g. max)
     def __init__(self, get_layer, neuron=0):
         super().__init__(get_layer)
         self.neuron = neuron

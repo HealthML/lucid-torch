@@ -4,7 +4,6 @@ from ..Objective import Objective
 
 
 class ChannelDiversityObjective(Objective):
-    # TODO different gram aggregation (e.g. max)
     def __init__(self, get_layer, channel):
         super().__init__(get_layer)
         self.channel = channel

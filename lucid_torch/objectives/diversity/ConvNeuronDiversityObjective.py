@@ -5,7 +5,6 @@ from ..Objective import Objective
 
 
 class ConvNeuronDiversityObjective(Objective):
-    # TODO different gram aggregation (e.g. max)
     def __init__(self, get_layer, channel=0, n_x=None, n_y=None):
         super().__init__(get_layer)
         self.channel = channel
