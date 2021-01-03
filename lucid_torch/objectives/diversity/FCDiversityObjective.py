@@ -1,6 +1,6 @@
 import torch
 
-from lucid_torch.objectives import Objective
+from ..Objective import Objective
 
 
 class FCDiversityObjective(Objective):

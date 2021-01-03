@@ -1,6 +1,6 @@
 from abc import ABC
 
-from lucid_torch.image import ImageBatch
+from ..image import ImageBatch
 
 
 class Objective(ABC):
@@ -26,25 +26,25 @@ class Objective(ABC):
         return loss.item()
 
     def __add__(self, other):
-        from lucid_torch.objectives.joint import JointObjective
-        from lucid_torch.objectives import ConstObjective
+        from .ConstObjective import ConstObjective
+        from .joint import JointObjective
         if isinstance(other, (int, float)):
             other = ConstObjective(other)
         return JointObjective([self, other])
 
     def __neg__(self):
-        from lucid_torch.objectives.joint import JointObjective
+        from .joint import JointObjective
         return JointObjective([self], [-1.])
 
     def __sub__(self, other):
-        from lucid_torch.objectives.joint import JointObjective
-        from lucid_torch.objectives import ConstObjective
+        from .ConstObjective import ConstObjective
+        from .joint import JointObjective
         if isinstance(other, (int, float)):
             other = ConstObjective(other)
         return JointObjective([self, other], [1., -1.])
 
     def __mul__(self, other):
-        from lucid_torch.objectives.joint import JointObjective, MultObjective
+        from .joint import JointObjective, MultObjective
         if isinstance(other, (int, float)):
             return JointObjective([self], [other])
         else:
@@ -57,8 +57,8 @@ class Objective(ABC):
         return self.__add__(other)
 
     def __rsub__(self, other):
-        from lucid_torch.objectives.joint import JointObjective
-        from lucid_torch.objectives import ConstObjective
+        from .ConstObjective import ConstObjective
+        from .joint import JointObjective
         if isinstance(other, (int, float)):
             other = ConstObjective(other)
         return JointObjective([other, self], [1., -1.])

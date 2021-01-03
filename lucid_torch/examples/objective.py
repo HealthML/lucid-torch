@@ -1,9 +1,10 @@
 import torch
 from torchvision import models
 
-from lucid_torch.image import ImageBatch
-from lucid_torch.objectives import ChannelObjective, ConvNeuronObjective, FCNeuronObjective
-from lucid_torch.renderer import RendererBuilder
+from ..image import ImageBatch
+from ..objectives import (ChannelObjective, ConvNeuronObjective,
+                          FCNeuronObjective)
+from ..renderer import RendererBuilder
 
 
 def objective(device="cuda:0", numberOfFrames=500):

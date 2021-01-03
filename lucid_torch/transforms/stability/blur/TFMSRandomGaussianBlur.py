@@ -2,7 +2,7 @@ from random import randint
 
 from torch import nn
 
-from lucid_torch.transforms.stability.blur import TFMSGaussianBlur
+from ...stability.blur import TFMSGaussianBlur
 
 
 class TFMSRandomGaussianBlur(nn.Module):

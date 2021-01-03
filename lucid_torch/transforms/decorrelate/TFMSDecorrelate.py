@@ -1,6 +1,6 @@
 import torch
 
-from lucid_torch.image.color import linear_decorrelate
+from ...image.color import linear_decorrelate
 
 
 class TFMSDecorrelate(torch.nn.Module):

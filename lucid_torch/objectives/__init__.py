@@ -1,16 +1,24 @@
-from .ConstObjective import ConstObjective
-from .Objective import Objective
 from .channel import ChannelObjective, DirectionChannelObjective
-from .diversity import ChannelDiversityObjective, ConvNeuronDiversityObjective, FCDiversityObjective
+from .ConstObjective import ConstObjective
+from .diversity import (ChannelDiversityObjective,
+                        ConvNeuronDiversityObjective, FCDiversityObjective)
 from .image import MeanOpacityObjective, TVRegularizerObjective
 from .layer import LayerObjective
 from .neuron import ConvNeuronObjective, FCNeuronObjective
+from .Objective import Objective
 
 __all__ = [
-    "ConstObjective", "Objective",
-    "ChannelObjective", "DirectionChannelObjective",
-    "ChannelDiversityObjective", "ConvNeuronDiversityObjective", "FCDiversityObjective",
-    "ImageObjective", "MeanOpacityObjective", "TVRegularizerObjective",
+    "ChannelDiversityObjective",
+    "ChannelObjective",
+    "ConstObjective",
+    "ConvNeuronDiversityObjective",
+    "ConvNeuronObjective",
+    "DirectionChannelObjective",
+    "FCDiversityObjective",
+    "FCNeuronObjective",
+    "ImageObjective",
     "LayerObjective",
-    "ConvNeuronObjective", "FCNeuronObjective",
+    "MeanOpacityObjective",
+    "Objective",
+    "TVRegularizerObjective"
 ]

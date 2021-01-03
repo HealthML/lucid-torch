@@ -1,8 +1,8 @@
 from torchvision import models
 
-from lucid_torch.image import ImageBatch
-from lucid_torch.objectives import ChannelObjective
-from lucid_torch.renderer import RendererBuilder
+from ..image import ImageBatch
+from ..objectives import ChannelObjective
+from ..renderer import RendererBuilder
 
 
 def basic(device="cuda:0", numberOfFrames=500):

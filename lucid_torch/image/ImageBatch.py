@@ -5,7 +5,7 @@ import PIL
 import torch
 from torchvision.transforms import ToTensor
 
-from lucid_torch.transforms import presets
+from ..transforms import presets
 
 
 class ImageBatch:

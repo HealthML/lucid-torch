@@ -1,6 +1,6 @@
 import numpy as np
 
-from lucid_torch.objectives import Objective
+from ..Objective import Objective
 
 
 class ConvNeuronObjective(Objective):

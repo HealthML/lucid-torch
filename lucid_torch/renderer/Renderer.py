@@ -1,9 +1,8 @@
 import torch
 
-from lucid_torch.image import ImageBatch
-from lucid_torch.objectives import Objective
-from lucid_torch.utils import prep_model
-
+from ..image import ImageBatch
+from ..objectives import Objective
+from ..utils import prep_model
 from .Observer import RendererObserver
 
 

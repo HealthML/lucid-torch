@@ -1,5 +1,4 @@
-from lucid_torch.image import ImageBatch
-
+from ..image import ImageBatch
 from .Objective import Objective
 
 

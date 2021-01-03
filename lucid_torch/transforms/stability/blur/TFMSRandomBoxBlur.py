@@ -2,7 +2,7 @@ from random import randint
 
 import torch
 
-from lucid_torch.transforms.stability.blur import TFMSBoxBlur
+from ...stability.blur import TFMSBoxBlur
 
 
 class TFMSRandomBoxBlur(torch.nn.Module):

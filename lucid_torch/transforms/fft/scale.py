@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from lucid_torch.image.spatial import rfft2d_freqs
+from ...image.spatial import rfft2d_freqs
 
 
 def fft_scale(h: int, w: int, decay_power: float):

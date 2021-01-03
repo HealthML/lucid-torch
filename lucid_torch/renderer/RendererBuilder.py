@@ -2,10 +2,9 @@ from typing import Union
 
 import torch
 
-import lucid_torch.transforms.presets as presets
-from lucid_torch.image import ImageBatch
-from lucid_torch.objectives import Objective
-
+from ..image import ImageBatch
+from ..objectives import Objective
+from ..transforms.presets import drawTFMS, trainTFMS
 from .LivePreview import RendererLivePreview
 from .ProgressBar import RendererProgressBar
 from .Renderer import Renderer
@@ -18,8 +17,8 @@ class RendererBuilder:
         self._model = None
         self._optimizer = None
         self._objective = None
-        self._trainTFMS = presets.trainTFMS()
-        self._drawTFMS = presets.drawTFMS()
+        self._trainTFMS = trainTFMS()
+        self._drawTFMS = drawTFMS()
         self._videoFileName = None
         self._fps = None
         self._progressBar = True
