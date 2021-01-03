@@ -2,7 +2,6 @@ import torch
 
 from ..image import ImageBatch
 from ..objectives import Objective
-from ..utils import prep_model
 from .Observer import RendererObserver
 
 
@@ -15,7 +14,7 @@ class Renderer:
                  trainTFMS: torch.nn.Module,
                  drawTFMS: torch.nn.Module):
         self.imageBatch = imageBatch
-        self.model = prep_model(model, self.imageBatch.data.device)
+        self.model = self._prepare_model(model)
         self.optimizer = optimizer
         self.objective = objective
         self.objective.register(self.model)
@@ -57,6 +56,13 @@ class Renderer:
 
     def loss(self):
         return self._loss
+
+    def _prepare_model(self, model: torch.nn.Module):
+        model = model.eval().to(self.imageBatch.data.device)
+        for mod in model.modules():
+            if hasattr(mod, 'inplace'):
+                mod.inplace = False
+        return model
 
     def _startRender(self, numberOfFrames: int):
         for observer in self.observers:
