@@ -5,7 +5,7 @@ setup(
     version='1.0.0',
     description='Feature visualization for pytorch',
     url='https://github.com/mkirchler/feature-visualization',
-    author='Hasso Plattner Institute Chair of Digital Health - Machine Learning',
+    author='<COPYRIGHT HOLDER>',
     packages=find_packages(),
     python_requires='==3.8.*',
     install_requires=['torch==1.5.0',
