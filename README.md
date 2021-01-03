@@ -6,7 +6,7 @@
 
 1. Clone the repository: `git clone https://github.com/mkirchler/feature-visualization.git`
 2. Go into the folder: `cd featureVisualization`
-3. Install Lucid Torch: `pip install -e .`
+3. Install Lucid Torch: `pip install . -f https://download.pytorch.org/whl/torch_stable.html`
 
 ## Usage
 
@@ -28,4 +28,6 @@ trained_objective_image = objective(numberOfFrames=500)
 
 ## Running the Tests
 
-First, [setup](#setup) the project. Then run `pytest`.
+1. [Setup](#setup) the project
+2. Install `pytest` with `pip install pytest==5.3.5`
+3. Run `python -m pytest`
