@@ -10,13 +10,15 @@
 
 ## Usage
 
+A quickstart guide for different architectures can be found here: [Quickstart](quickstart.ipynb).
+
 You can find usage samples here:
 
 - [Basic](lucid_torch/examples/basic.py)
 - [Multiple Objectives](lucid_torch/examples/multiple_objectives.py)
 - [Alpha Objective](lucid_torch/examples/alpha.py)
 
-In [this](examples.ipynb) IPython notebook we have executed the examples.
+In [this](examples.ipynb) Jupyter notebook we have executed the examples.
 
 ## Running the Tests
 
