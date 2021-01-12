@@ -11,7 +11,7 @@ setup(
     install_requires=['torch==1.5.0',
                       "numpy==1.18.1",
                       "pandas==1.0.1",
-                      "pillow==7.0.0",
+                      "pillow==7.1.0",
                       "scipy==1.4.1",
                       "torchvision==0.6.0",
                       "tqdm==4.42.1",
