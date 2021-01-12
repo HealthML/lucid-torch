@@ -4,7 +4,7 @@ setup(
     name='Lucid Torch',
     version='1.0.0',
     description='Feature visualization for pytorch',
-    url='https://github.com/mkirchler/feature-visualization',
+    url='https://github.com/HealthML/lucid-torch',
     author='Martin Graf, Matthias Kirchler',
     packages=find_packages(),
     python_requires='==3.8.*',

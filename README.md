@@ -1,11 +1,11 @@
 # Lucid Torch
 
-![Tests](https://github.com/mkirchler/feature-visualization/workflows/Tests/badge.svg)
+![Tests](https://github.com/HealthML/lucid-torch/workflows/Tests/badge.svg)
 
 ## Setup
 
-1. Clone the repository: `git clone https://github.com/mkirchler/feature-visualization.git`
-2. Go into the folder: `cd featureVisualization`
+1. Clone the repository: `git clone https://github.com/HealthML/lucid-torch.git`
+2. Go into the folder: `cd lucid-torch`
 3. Install Lucid Torch: `pip install . -f https://download.pytorch.org/whl/torch_stable.html`
 
 ## Usage
