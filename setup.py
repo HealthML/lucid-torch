@@ -19,6 +19,6 @@ setup(
                       "matplotlib==3.1.3",
                       "kornia==0.3.*",
                       "moviepy==1.0.1",
-                      "ipython==7.12.0"
+                      "ipython==7.16.3"
                       ]
 )
