@@ -9,7 +9,7 @@ setup(
     packages=find_packages(),
     python_requires='==3.8.*',
     install_requires=['torch==1.5.0',
-                      "numpy==1.18.1",
+                      "numpy==1.22.0",
                       "pandas==1.0.1",
                       "pillow==7.0.0",
                       "scipy==1.4.1",
